@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">MediaPlayer</string>
+    <string name="gkplayer">GK Media Player</string>
+    <string name="sample">Sample text </string>
+</resources>
