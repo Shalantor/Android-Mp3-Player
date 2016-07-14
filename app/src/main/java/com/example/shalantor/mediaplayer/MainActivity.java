@@ -21,6 +21,10 @@ public class MainActivity extends AppCompatActivity {
         if(getIntent() == null){
             setVolumeControlStream(AudioManager.STREAM_MUSIC);
         }
+        this.adjustTextSize();
+    }
+
+    private void adjustTextSize(){
 
         /*Check size of screen to set textview font size*/
         Display display = getWindowManager().getDefaultDisplay();
@@ -39,4 +43,5 @@ public class MainActivity extends AppCompatActivity {
         currentSong.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.05 * height));
 
     }
+
 }
