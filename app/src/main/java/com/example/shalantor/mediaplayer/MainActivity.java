@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -47,6 +49,13 @@ public class MainActivity extends AppCompatActivity {
 
         title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.05 * height));
         currentSong.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.05 * height));
+
+        /*Now animate text in song textview*/
+        Animation animation = new TranslateAnimation(400,-400,0,0);
+        animation.setDuration(10000);
+        animation.setRepeatMode(Animation.RESTART);
+        animation.setRepeatCount(Animation.INFINITE);
+        currentSong.setAnimation(animation);
 
     }
 
