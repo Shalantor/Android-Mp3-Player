@@ -2,4 +2,9 @@
     <string name="app_name">MediaPlayer</string>
     <string name="gkplayer">GK Media Player</string>
     <string name="sample">Sample text </string>
+    <string name="record">Record a Sound</string>
+    <string name="previous">Play previous song</string>
+    <string name="play">Play/Pause current song</string>
+    <string name="stop">Stop current song</string>
+    <string name="next">Play next song</string>
 </resources>
