@@ -32,8 +32,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/sample"
-        android:gravity="end"
-        android:id="@+id/curSong"/>
+        android:gravity="start"
+        android:id="@+id/curSong"
+        android:ellipsize="marquee"
+        android:maxLines="1"/>
 
     <SeekBar
         android:layout_width="match_parent"

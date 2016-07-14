@@ -50,16 +50,16 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    /*Method that is called when play button is clicked*/
+    /*Method that is called when play button is clicked, to change its icon*/
     public void play(View view){
         /*Change value to opposite*/
         isPlaying = !isPlaying;
         ImageButton button = (ImageButton) findViewById(R.id.Pause);
         if(isPlaying){
-            button.setBackgroundResource(R.mipmap.pause);
+            button.setImageResource(R.mipmap.pause);
         }
         else{
-            button.setBackgroundResource(R.mipmap.play);
+            button.setImageResource(R.mipmap.play);
         }
     }
 
