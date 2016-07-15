@@ -1,9 +1,11 @@
 package com.example.shalantor.mediaplayer;
 
+import android.content.Context;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +19,7 @@ import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
 
+    private MediaPlayer player;
     private int width;
     private int height;/*TODO:think about necessity of keeping height*/
     private boolean isPlaying = false;
@@ -26,10 +29,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         /*Check if app is being restarted*/
-        if(getIntent() == null){
-            setVolumeControlStream(AudioManager.STREAM_MUSIC);
-        }
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
         this.adjustText();
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,20,0);
+        player = MediaPlayer.create(MainActivity.this,R.raw.beyblade);
+        player.start();
     }
 
     /*This function is used to adjust the text size in the textviews
@@ -80,10 +85,13 @@ public class MainActivity extends AppCompatActivity {
         ImageButton button = (ImageButton) findViewById(R.id.Pause);
         if(isPlaying){
             button.setImageResource(R.mipmap.pause);
+            player.pause();
         }
         else{
             button.setImageResource(R.mipmap.play);
+            player.start();
         }
+        player.start();
     }
 
 }
