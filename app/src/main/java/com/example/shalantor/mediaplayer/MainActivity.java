@@ -1,9 +1,12 @@
 package com.example.shalantor.mediaplayer;
 
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.media.AudioManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
@@ -26,13 +29,14 @@ public class MainActivity extends AppCompatActivity {
         if(getIntent() == null){
             setVolumeControlStream(AudioManager.STREAM_MUSIC);
         }
-        this.adjustTextSize();
+        this.adjustText();
     }
 
     /*This function is used to adjust the text size in the textviews
      *to match the screen size of a device better.
+     * It also begins animating the text to move from right to left
      */
-    private void adjustTextSize(){
+    private void adjustText(){
 
         /*Check size of screen to set textview font size*/
         Display display = getWindowManager().getDefaultDisplay();
@@ -47,12 +51,21 @@ public class MainActivity extends AppCompatActivity {
         TextView title = (TextView) findViewById(R.id.title);
         TextView currentSong = (TextView) findViewById(R.id.curSong);
 
+        /*Set sizes*/
         title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.05 * height));
         currentSong.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.05 * height));
 
+        /*Find out text width in pixels*/
+        Rect bounds = new Rect();
+        Paint textPaint = currentSong.getPaint();
+        textPaint.getTextBounds(currentSong.getText().toString(),
+                0,currentSong.getText().toString().length(),bounds);
+        int textWidth = bounds.width();
+        Log.d("HELLO","text width is: " + textWidth);
+
         /*Now animate text in song textview*/
-        Animation animation = new TranslateAnimation(400,-400,0,0);
-        animation.setDuration(10000);
+        Animation animation = new TranslateAnimation(width,-textWidth,0,0);
+        animation.setDuration(5000);
         animation.setRepeatMode(Animation.RESTART);
         animation.setRepeatCount(Animation.INFINITE);
         currentSong.setAnimation(animation);
