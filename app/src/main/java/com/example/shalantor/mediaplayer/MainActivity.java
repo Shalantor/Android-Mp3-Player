@@ -54,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
         /*Set sizes*/
         title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.05 * height));
         currentSong.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.05 * height));
+        currentSong.setSelected(true);
 
         /*Find out text width in pixels*/
         Rect bounds = new Rect();
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
 
         /*Now animate text in song textview*/
         Animation animation = new TranslateAnimation(width,-textWidth,0,0);
-        animation.setDuration(5000);
+        animation.setDuration(15000);
         animation.setRepeatMode(Animation.RESTART);
         animation.setRepeatCount(Animation.INFINITE);
         currentSong.setAnimation(animation);
