@@ -1,11 +1,14 @@
 package com.example.shalantor.mediaplayer;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,12 +20,18 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class MainActivity extends AppCompatActivity {
 
     private MediaPlayer player;
     private int width;
     private int height;/*TODO:think about necessity of keeping height*/
     private boolean isPlaying = false;
+    private ArrayList<HashMap<String, String>> songs = new ArrayList<>();
+    private final static String MEDIA_PATH = new String("/sdcard/");
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,7 +44,43 @@ public class MainActivity extends AppCompatActivity {
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,20,0);
         player = MediaPlayer.create(MainActivity.this,R.raw.beyblade);
         player.start();
+        this.createPlaylist();
     }
+
+    private void createPlaylist(){
+        String[] STAR = {"*"};
+        Cursor cursor;
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
+
+        cursor = getContentResolver().query(uri,STAR,selection,null,null);
+
+        if(cursor != null){
+            if(cursor.moveToFirst()){
+                do {
+                    String songName = cursor.getString(cursor
+                            .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
+                    String path = cursor.getString(cursor
+                            .getColumnIndex(MediaStore.Audio.Media.DATA));
+
+
+                    String albumName = cursor.getString(cursor
+                            .getColumnIndex(MediaStore.Audio.Media.ALBUM));
+                    int albumId = cursor
+                            .getInt(cursor
+                                    .getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
+                    HashMap<String, String> song = new HashMap<>();
+                    song.put("songTitle", albumName + " " + songName + "___" + albumId);
+                    song.put("songPath", path);
+                    Log.d("TITLE",albumName + " " + songName + "___" + albumId);
+                    Log.d("PATH",path);
+                    songs.add(song);
+                }while(cursor.moveToNext());
+            }
+        }
+
+    }
+
 
     /*This function is used to adjust the text size in the textviews
      *to match the screen size of a device better.
@@ -91,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
             button.setImageResource(R.mipmap.play);
             player.start();
         }
-        player.start();
     }
 
 }
