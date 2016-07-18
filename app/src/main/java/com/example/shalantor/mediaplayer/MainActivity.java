@@ -21,6 +21,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private MediaPlayer player;
     private int width;
     private int height;/*TODO:think about necessity of keeping height*/
-    private boolean isPlaying = false;
+    private boolean isPlaying = false;/*TODO:Mediaplayer has method isPlaying()*/
     private ArrayList<HashMap<String, String>> songs = new ArrayList<>();
     private final static String MEDIA_PATH = new String("/sdcard/");
 
@@ -126,17 +127,34 @@ public class MainActivity extends AppCompatActivity {
 
     /*Method that is called when play button is clicked, to change its icon*/
     public void play(View view){
-        /*Change value to opposite*/
-        isPlaying = !isPlaying;
         ImageButton button = (ImageButton) findViewById(R.id.Pause);
         if(isPlaying){
-            button.setImageResource(R.mipmap.pause);
+            button.setImageResource(R.mipmap.play);
             player.pause();
         }
         else{
-            button.setImageResource(R.mipmap.play);
+            if(player == null){
+                player = MediaPlayer.create(MainActivity.this,R.raw.beyblade);
+            }
+            button.setImageResource(R.mipmap.pause);
             player.start();
         }
+        /*Change value to opposite*/
+        isPlaying = !isPlaying;
+    }
+
+    public void stop(View view){
+
+        /*If we have playback stop it*/
+        if(player == null){
+            return;
+        }
+        isPlaying = false;
+        player.release();
+        player = null;
+        ImageButton button = (ImageButton) findViewById(R.id.Pause);
+        button.setImageResource(R.mipmap.play);
+
     }
 
 }
