@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,20,0);
         /*Get mp3 files on sd card*/
         this.createPlaylist();
+        /*Now update listview to show elements*/
     }
 
     private void createPlaylist(){
