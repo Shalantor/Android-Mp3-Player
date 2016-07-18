@@ -40,10 +40,10 @@ public class MainActivity extends AppCompatActivity {
         /*Check if app is being restarted*/
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         this.adjustText();
+        /*Set volume*/
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,20,0);
-        player = MediaPlayer.create(MainActivity.this,R.raw.beyblade);
-        player.start();
+        /*Get mp3 files on sd card*/
         this.createPlaylist();
     }
 
