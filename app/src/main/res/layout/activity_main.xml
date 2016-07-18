@@ -47,7 +47,9 @@
     <SeekBar
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.1"/>
+        android:layout_weight="0.1"
+        android:clickable="true"
+        android:id="@+id/seekbar"/>
 
     <LinearLayout
         android:layout_width="match_parent"

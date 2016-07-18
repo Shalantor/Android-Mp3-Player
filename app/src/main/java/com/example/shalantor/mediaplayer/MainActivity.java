@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import java.io.File;
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean isPlaying = false;/*TODO:Mediaplayer has method isPlaying()*/
     private ArrayList<HashMap<String, String>> songs = new ArrayList<>();
     private final static String MEDIA_PATH = new String("/sdcard/");
+    private int currentSongDuration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,6 +137,10 @@ public class MainActivity extends AppCompatActivity {
         else{
             if(player == null){
                 player = MediaPlayer.create(MainActivity.this,R.raw.beyblade);
+                /*Get duration for seekbar*/
+                currentSongDuration = player.getDuration() / 1000;
+                SeekBar seek = (SeekBar) findViewById(R.id.seekbar);
+                seek.setMax(currentSongDuration);
             }
             button.setImageResource(R.mipmap.pause);
             player.start();
@@ -152,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         isPlaying = false;
         player.release();
         player = null;
-        ImageButton button = (ImageButton) findViewById(R.id.Pause);
+        ImageButton button  = (ImageButton) findViewById(R.id.Pause);
         button.setImageResource(R.mipmap.play);
 
     }
