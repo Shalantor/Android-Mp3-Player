@@ -6,8 +6,10 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.AudioManager;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -20,6 +22,8 @@ import android.view.animation.TranslateAnimation;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,6 +39,8 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<HashMap<String, String>> songs = new ArrayList<>();
     private final static String MEDIA_PATH = new String("/sdcard/");
     private int currentSongDuration;
+    private int numSongs;
+    private int curSongIndex;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,13 +82,11 @@ public class MainActivity extends AppCompatActivity {
                     HashMap<String, String> song = new HashMap<>();
                     song.put("songTitle", albumName + " " + songName + "___" + albumId);
                     song.put("songPath", path);
-                    Log.d("TITLE",albumName + " " + songName + "___" + albumId);
-                    Log.d("PATH",path);
                     songs.add(song);
                 }while(cursor.moveToNext());
             }
         }
-
+        numSongs = songs.size();
     }
 
 
@@ -136,11 +140,15 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             if(player == null){
-                player = MediaPlayer.create(MainActivity.this,R.raw.beyblade);
+                String path = songs.get(curSongIndex).get("songPath");
+                player = MediaPlayer.create(MainActivity.this,Uri.parse(path));
                 /*Get duration for seekbar*/
                 currentSongDuration = player.getDuration() / 1000;
                 SeekBar seek = (SeekBar) findViewById(R.id.seekbar);
                 seek.setMax(currentSongDuration);
+                TextView songView = (TextView) findViewById(R.id.curSong);
+                /*TODO:Change animation duration of text because text changes*/
+                songView.setText(songs.get(curSongIndex).get("songTitle"), TextView.BufferType.NORMAL);
             }
             button.setImageResource(R.mipmap.pause);
             player.start();
@@ -149,6 +157,8 @@ public class MainActivity extends AppCompatActivity {
         isPlaying = !isPlaying;
     }
 
+
+    /*Stop current song*/
     public void stop(View view){
 
         /*If we have playback stop it*/
@@ -162,5 +172,35 @@ public class MainActivity extends AppCompatActivity {
         button.setImageResource(R.mipmap.play);
 
     }
+
+    /*Play next song in playlist*/
+    public void nextSong(View view){
+
+        curSongIndex = (curSongIndex + 1) % numSongs;
+
+        if(player != null) {
+            player.release();
+            player = null;
+        }
+
+        isPlaying=false;
+        ImageButton b = (ImageButton) findViewById(R.id.Pause);
+        b.performClick();
+    }
+
+    /*Play previous song in playlist*/
+    public void prevSong(View view){
+        curSongIndex = ((curSongIndex - 1) + numSongs) % numSongs;
+
+        if(player!=null) {
+            player.release();
+            player = null;
+        }
+
+        isPlaying = false;
+        ImageButton b = (ImageButton) findViewById(R.id.Pause);
+        b.performClick();
+
+     }
 
 }

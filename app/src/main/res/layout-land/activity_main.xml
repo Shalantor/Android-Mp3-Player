@@ -82,6 +82,7 @@
                 android:src="@mipmap/previous"
                 android:scaleType="fitXY"
                 android:layout_weight="1"
+                android:onClick="prevSong"
                 />
 
             <ImageButton
@@ -117,6 +118,7 @@
                 android:src="@mipmap/next"
                 android:scaleType="fitXY"
                 android:layout_weight="1"
+                android:onClick="nextSong"
                 />
 
         </LinearLayout>
