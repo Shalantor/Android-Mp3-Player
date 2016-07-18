@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
                 TextView songView = (TextView) findViewById(R.id.curSong);
                 /*TODO:Change animation duration of text because text changes*/
                 songView.setText(songs.get(curSongIndex).get("songTitle"), TextView.BufferType.NORMAL);
+                this.adjustText();
             }
             button.setImageResource(R.mipmap.pause);
             player.start();
