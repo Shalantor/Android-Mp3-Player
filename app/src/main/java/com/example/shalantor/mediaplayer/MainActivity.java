@@ -43,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
     private int numSongs;
     private int curSongIndex;
     private android.os.Handler handler = new android.os.Handler();
+    private SeekBar seek ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +51,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         /*Check if app is being restarted*/
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        seek = (SeekBar) findViewById(R.id.seekbar);
         this.adjustText();
         /*Set volume*/
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,20,0);
         /*Get mp3 files on sd card*/
         this.createPlaylist();
-        /*Now update listview to show elements*/
+        /*Now add listener to seekbar, so that the user can change the position of audio*/
+        seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if(player != null && fromUser){
+                    player.seekTo(progress * 1000);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
     }
 
     private void createPlaylist(){
