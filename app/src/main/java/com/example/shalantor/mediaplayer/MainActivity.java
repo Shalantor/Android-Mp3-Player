@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     private int currentSongDuration;
     private int numSongs;
     private int curSongIndex;
+    private android.os.Handler handler = new android.os.Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -150,12 +152,28 @@ public class MainActivity extends AppCompatActivity {
                 /*TODO:Change animation duration of text because text changes*/
                 songView.setText(songs.get(curSongIndex).get("songTitle"), TextView.BufferType.NORMAL);
                 this.adjustText();
+                this.adjustSeekBarMovement();
             }
             button.setImageResource(R.mipmap.pause);
             player.start();
         }
         /*Change value to opposite*/
         isPlaying = !isPlaying;
+    }
+
+    private void adjustSeekBarMovement(){
+
+        MainActivity.this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(player != null){
+                    int curPos = player.getCurrentPosition() / 1000;
+                    SeekBar seek = (SeekBar) findViewById(R.id.seekbar);
+                    seek.setProgress(curPos);
+                }
+                handler.postDelayed(this,1000);
+            }
+        });
     }
 
 
@@ -171,7 +189,8 @@ public class MainActivity extends AppCompatActivity {
         player = null;
         ImageButton button  = (ImageButton) findViewById(R.id.Pause);
         button.setImageResource(R.mipmap.play);
-
+        SeekBar seek = (SeekBar) findViewById(R.id.seekbar);
+        seek.setProgress(0);
     }
 
     /*Play next song in playlist*/
