@@ -13,13 +13,16 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.ListViewCompat;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -45,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private int curSongIndex;
     private android.os.Handler handler = new android.os.Handler();
     private SeekBar seek ;
+    private ArrayAdapter<String> adapter;
     static final String CURRENT_SONG = "curSong";
     static final String CURRENT_SEEKBAR_POS = "seekPos";
     static final String ISPLAYING = "isPlaying";
@@ -138,6 +142,12 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         numSongs = songNames.size();
+
+        /*New create listview*/
+        ListView list = (ListView) findViewById(R.id.playlist);
+        adapter = new ArrayAdapter<>(MainActivity.this,R.layout.list_item,songNames);
+        list.setAdapter(adapter);
+
     }
 
 
