@@ -37,7 +37,8 @@ public class MainActivity extends AppCompatActivity {
     private int width;
     private int height;/*TODO:think about necessity of keeping height*/
     private boolean isPlaying = false;/*TODO:Mediaplayer has method isPlaying()*/
-    private ArrayList<HashMap<String, String>> songs = new ArrayList<>();
+    private ArrayList<String> songNames = new ArrayList<>();
+    private ArrayList<String> songPaths = new ArrayList<>();
     private final static String MEDIA_PATH = new String("/sdcard/");
     private int currentSongDuration;
     private int numSongs;
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
             boolean isPlayerNull = savedInstanceState.getBoolean(ISPLAYERNULL);
             if(!isPlayerNull){
                 player = MediaPlayer.create(MainActivity.this,
-                        Uri.parse(songs.get(curSongIndex).get("songPath")));
+                        Uri.parse(songPaths.get(curSongIndex)));
                 int seekRange = player.getDuration() / 1000;
                 seek.setMax(seekRange);
                 seek.setProgress(seekPos);
@@ -126,19 +127,17 @@ public class MainActivity extends AppCompatActivity {
                             .getColumnIndex(MediaStore.Audio.Media.DATA));
 
 
-                    String albumName = cursor.getString(cursor
+                    /*String albumName = cursor.getString(cursor
                             .getColumnIndex(MediaStore.Audio.Media.ALBUM));
                     int albumId = cursor
                             .getInt(cursor
-                                    .getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
-                    HashMap<String, String> song = new HashMap<>();
-                    song.put("songTitle", albumName + " " + songName + "___" + albumId);
-                    song.put("songPath", path);
-                    songs.add(song);
+                                    .getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));*/
+                    songNames.add(songName);
+                    songPaths.add(path);
                 }while(cursor.moveToNext());
             }
         }
-        numSongs = songs.size();
+        numSongs = songNames.size();
     }
 
 
@@ -192,13 +191,13 @@ public class MainActivity extends AppCompatActivity {
         }
         else{
             if(player == null){
-                String path = songs.get(curSongIndex).get("songPath");
+                String path = songPaths.get(curSongIndex);
                 player = MediaPlayer.create(MainActivity.this,Uri.parse(path));
                 /*Get duration for seekbar*/
                 currentSongDuration = player.getDuration() / 1000;
                 seek.setMax(currentSongDuration);
                 TextView songView = (TextView) findViewById(R.id.curSong);
-                songView.setText(songs.get(curSongIndex).get("songTitle"), TextView.BufferType.NORMAL);
+                songView.setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
                 this.adjustText();
                 this.adjustSeekBarMovement();
             }
