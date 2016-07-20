@@ -51,11 +51,15 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         /*Check if app is being restarted*/
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        /*Instantiate seekbar variable*/
         seek = (SeekBar) findViewById(R.id.seekbar);
+        /*Adjust text size and movement in song textview*/
         this.adjustText();
+
         /*Set volume*/
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,20,0);
+
         /*Get mp3 files on sd card*/
         this.createPlaylist();
         /*Now add listener to seekbar, so that the user can change the position of audio*/
@@ -78,6 +82,8 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
+    /*Scans the sd card and saves all songs in a list of hashmaps*/
 
     private void createPlaylist(){
         String[] STAR = {"*"};
@@ -166,10 +172,8 @@ public class MainActivity extends AppCompatActivity {
                 player = MediaPlayer.create(MainActivity.this,Uri.parse(path));
                 /*Get duration for seekbar*/
                 currentSongDuration = player.getDuration() / 1000;
-                SeekBar seek = (SeekBar) findViewById(R.id.seekbar);
                 seek.setMax(currentSongDuration);
                 TextView songView = (TextView) findViewById(R.id.curSong);
-                /*TODO:Change animation duration of text because text changes*/
                 songView.setText(songs.get(curSongIndex).get("songTitle"), TextView.BufferType.NORMAL);
                 this.adjustText();
                 this.adjustSeekBarMovement();
@@ -181,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
         isPlaying = !isPlaying;
     }
 
+    /*Change pointer of seekbar once every second, as song is playing*/
     private void adjustSeekBarMovement(){
 
         MainActivity.this.runOnUiThread(new Runnable() {
@@ -188,7 +193,6 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 if(player != null){
                     int curPos = player.getCurrentPosition() / 1000;
-                    SeekBar seek = (SeekBar) findViewById(R.id.seekbar);
                     seek.setProgress(curPos);
                 }
                 handler.postDelayed(this,1000);
@@ -209,7 +213,6 @@ public class MainActivity extends AppCompatActivity {
         player = null;
         ImageButton button  = (ImageButton) findViewById(R.id.Pause);
         button.setImageResource(R.mipmap.play);
-        SeekBar seek = (SeekBar) findViewById(R.id.seekbar);
         seek.setProgress(0);
     }
 
