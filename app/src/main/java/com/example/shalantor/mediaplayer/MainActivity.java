@@ -44,6 +44,11 @@ public class MainActivity extends AppCompatActivity {
     private int curSongIndex;
     private android.os.Handler handler = new android.os.Handler();
     private SeekBar seek ;
+    static final String CURRENT_SONG = "curSong";
+    static final String CURRENT_SEEKBAR_POS = "seekPos";
+    static final String ISPLAYING = "isPlaying";
+    static final String ISPLAYERNULL = "isPaused";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +58,27 @@ public class MainActivity extends AppCompatActivity {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         /*Instantiate seekbar variable*/
         seek = (SeekBar) findViewById(R.id.seekbar);
+        /*Get mp3 files on sd card*/
+        this.createPlaylist();
+        /*Check if being recreated*/
+        if(savedInstanceState != null){
+            curSongIndex = savedInstanceState.getInt(CURRENT_SONG);
+            int seekPos = savedInstanceState.getInt(CURRENT_SEEKBAR_POS);
+            isPlaying = savedInstanceState.getBoolean(ISPLAYING);
+            boolean isPlayerNull = savedInstanceState.getBoolean(ISPLAYERNULL);
+            if(!isPlayerNull){
+                player = MediaPlayer.create(MainActivity.this,
+                        Uri.parse(songs.get(curSongIndex).get("songPath")));
+                int seekRange = player.getDuration() / 1000;
+                seek.setMax(seekRange);
+                seek.setProgress(seekPos);
+                this.adjustSeekBarMovement();
+                player.seekTo(seekPos * 1000);
+                if(isPlaying){
+                    player.start();
+                }
+            }
+        }
         /*Adjust text size and movement in song textview*/
         this.adjustText();
 
@@ -60,8 +86,6 @@ public class MainActivity extends AppCompatActivity {
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,20,0);
 
-        /*Get mp3 files on sd card*/
-        this.createPlaylist();
         /*Now add listener to seekbar, so that the user can change the position of audio*/
         seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
@@ -245,5 +269,27 @@ public class MainActivity extends AppCompatActivity {
         b.performClick();
 
      }
+    /*OnDestroy function Override*/
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        /*Stop method tracing*/
+        if(player != null){
+            player.release();
+            player = null;
+        }
+    }
+
+    /*Save data when destroyed*/
+    @Override
+    public void onSaveInstanceState(Bundle save){
+        /*Save current state of media player*/
+        save.putInt(CURRENT_SONG,curSongIndex);
+        save.putInt(CURRENT_SEEKBAR_POS,seek.getProgress());
+        save.putBoolean(ISPLAYING,isPlaying);
+        save.putBoolean(ISPLAYERNULL,player == null);
+        /*Call super class same method*/
+        super.onSaveInstanceState(save);
+    }
 
 }
