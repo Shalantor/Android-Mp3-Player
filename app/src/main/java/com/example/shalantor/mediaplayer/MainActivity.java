@@ -20,6 +20,7 @@ import android.view.Display;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -143,11 +144,29 @@ public class MainActivity extends AppCompatActivity {
         }
         numSongs = songNames.size();
 
-        /*New create listview*/
+        /*New create listview and add listener*/
         ListView list = (ListView) findViewById(R.id.playlist);
         adapter = new ArrayAdapter<>(MainActivity.this,R.layout.list_item,songNames);
         list.setAdapter(adapter);
 
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                /*If there is player before release it*/
+                if(player != null){
+                    player.release();
+                    player = null;
+                }
+                /*Create new player with selected song*/
+                player = MediaPlayer.create(MainActivity.this,
+                            Uri.parse(songPaths.get(position)));
+                /*Change current song index*/
+                curSongIndex = position;
+                /*Start new song*/
+                player.start();
+                MainActivity.this.adjustText();
+            }
+        });
     }
 
 
