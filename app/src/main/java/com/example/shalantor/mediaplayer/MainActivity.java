@@ -243,7 +243,11 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(player != null){
+                if (seek.getProgress() == seek.getMax()) {
+                    ImageButton button = (ImageButton) findViewById(R.id.next);
+                    button.performClick();
+                }
+                else if(player != null){
                     int curPos = player.getCurrentPosition() / 1000;
                     seek.setProgress(curPos);
                 }
