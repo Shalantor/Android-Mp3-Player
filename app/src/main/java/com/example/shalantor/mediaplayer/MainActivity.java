@@ -55,13 +55,25 @@ public class MainActivity extends AppCompatActivity {
     static final String CURRENT_SEEKBAR_POS = "seekPos";
     static final String ISPLAYING = "isPlaying";
     static final String ISPLAYERNULL = "isPaused";
+    private int orientation;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        /*Check if app is being restarted*/
+        orientation = this.getResources().getConfiguration().orientation;
+        /*LandScape orientation*/
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE){
+            setContentView(R.layout.activity_main);
+            this.setupPlayer(savedInstanceState);
+        }
+        else{
+            /*Temporarily empty*/
+        }
+    }
+
+    /*Function to set up the player*/
+    private void setupPlayer( Bundle savedInstanceState){
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         /*Instantiate seekbar variable*/
         seek = (SeekBar) findViewById(R.id.seekbar);
@@ -205,7 +217,6 @@ public class MainActivity extends AppCompatActivity {
 
         /*Now animate text in song textview*/
         /*Choose start based on screen orientation*/
-        int orientation = this.getResources().getConfiguration().orientation;
         Animation animation;
         if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
             animation = new TranslateAnimation(width / 2, -textWidth, 0, 0);
