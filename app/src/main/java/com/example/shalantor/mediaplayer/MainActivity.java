@@ -165,9 +165,7 @@ public class MainActivity extends AppCompatActivity {
                 curSongIndex = position;
                 /*Start new song*/
                 player.start();
-                /*TODO:Text doesnt get adjusted appropriately*/
                 MainActivity.this.adjustText();
-                MainActivity.this.adjustSeekBarMovement();
             }
         });
     }
@@ -254,6 +252,7 @@ public class MainActivity extends AppCompatActivity {
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                /*Time to go to next song*/
                 if (seek.getProgress() == seek.getMax()) {
                     ImageButton button = (ImageButton) findViewById(R.id.next);
                     button.performClick();
@@ -277,10 +276,13 @@ public class MainActivity extends AppCompatActivity {
         }
         isPlaying = false;
         player.release();
-        player = null;
+        player = null;/*Change play button icon*/
         ImageButton button  = (ImageButton) findViewById(R.id.Pause);
         button.setImageResource(R.mipmap.play);
         seek.setProgress(0);
+        /*Empty textview that shows current song*/
+        TextView currentSong = (TextView) findViewById(R.id.curSong);
+        currentSong.setText("", TextView.BufferType.NORMAL);
     }
 
     /*Play next song in playlist*/
