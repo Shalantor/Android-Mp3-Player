@@ -257,9 +257,12 @@ public class MainActivity extends AppCompatActivity {
                     ImageButton button = (ImageButton) findViewById(R.id.next);
                     button.performClick();
                 }
-                else if(player != null){
+                else if(player != null){/*Update seeker position*/
                     int curPos = player.getCurrentPosition() / 1000;
                     seek.setProgress(curPos);
+                }
+                else{/*No song is playing , dont let user change seeker*/
+                    seek.setProgress(0);
                 }
                 handler.postDelayed(this,1000);
             }
