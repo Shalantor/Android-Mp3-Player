@@ -1,6 +1,7 @@
 package com.example.shalantor.mediaplayer;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -164,7 +165,9 @@ public class MainActivity extends AppCompatActivity {
                 curSongIndex = position;
                 /*Start new song*/
                 player.start();
+                /*TODO:Text doesnt get adjusted appropriately*/
                 MainActivity.this.adjustText();
+                MainActivity.this.adjustSeekBarMovement();
             }
         });
     }
@@ -203,7 +206,15 @@ public class MainActivity extends AppCompatActivity {
         Log.d("HELLO","text width is: " + textWidth);
 
         /*Now animate text in song textview*/
-        Animation animation = new TranslateAnimation(width,-textWidth,0,0);
+        /*Choose start based on screen orientation*/
+        int orientation = this.getResources().getConfiguration().orientation;
+        Animation animation;
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            animation = new TranslateAnimation(width / 2, -textWidth, 0, 0);
+        }
+        else{
+            animation = new TranslateAnimation(width,-textWidth,0,0);
+        }
         animation.setDuration(15000);
         animation.setRepeatMode(Animation.RESTART);
         animation.setRepeatCount(Animation.INFINITE);
