@@ -68,7 +68,8 @@ public class MainActivity extends AppCompatActivity {
             this.setupPlayer(savedInstanceState);
         }
         else{
-            /*Temporarily empty*/
+            /*Created first time*/
+            setContentView(R.layout.fragment_container_portrait);
         }
     }
 
