@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
     static final String ISPLAYING = "isPlaying";
     static final String ISPLAYERNULL = "isPaused";
     private int orientation;
+    private ListView list;
 
 
     @Override
@@ -63,13 +64,22 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         orientation = this.getResources().getConfiguration().orientation;
         /*LandScape orientation*/
+        if(savedInstanceState == null){
+            this.createPlaylist();
+        }
         if(orientation == Configuration.ORIENTATION_LANDSCAPE){
             setContentView(R.layout.activity_main);
             this.setupPlayer(savedInstanceState);
+            this.addListViewListener();
         }
         else{
             /*Created first time*/
             setContentView(R.layout.fragment_container_portrait);
+            if(savedInstanceState == null){
+                /*No song playing so let user choose from list*/
+                MediaPlayerFragment mediaPlayer = new MediaPlayerFragment();
+                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,mediaPlayer).commit();
+            }
         }
     }
 
@@ -78,8 +88,6 @@ public class MainActivity extends AppCompatActivity {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         /*Instantiate seekbar variable*/
         seek = (SeekBar) findViewById(R.id.seekbar);
-        /*Get mp3 files on sd card*/
-        this.createPlaylist();
         /*Check if being recreated*/
         if(savedInstanceState != null){
             curSongIndex = savedInstanceState.getInt(CURRENT_SONG);
@@ -127,8 +135,35 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    /*Scans the sd card and saves all songs in a list of hashmaps*/
+    /*Adds listener to listview when in landscape orientation*/
+    private void addListViewListener(){
+        /*New create listview and add listener*/
+        list = (ListView) findViewById(R.id.playlist);
+        adapter = new ArrayAdapter<>(MainActivity.this,R.layout.list_item,songNames);
+        list.setAdapter(adapter);
 
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                /*If there is player before release it*/
+                if(player != null){
+                    player.release();
+                    player = null;
+                }
+                /*Create new player with selected song*/
+                player = MediaPlayer.create(MainActivity.this,
+                        Uri.parse(songPaths.get(position)));
+                /*Change current song index*/
+                curSongIndex = position;
+                /*Start new song*/
+                player.start();
+                MainActivity.this.adjustText();
+            }
+        });
+
+    }
+
+    /*Scans the sd card and saves all songs in a list of hashmaps*/
     private void createPlaylist(){
         String[] STAR = {"*"};
         Cursor cursor;
@@ -158,29 +193,6 @@ public class MainActivity extends AppCompatActivity {
         }
         numSongs = songNames.size();
 
-        /*New create listview and add listener*/
-        ListView list = (ListView) findViewById(R.id.playlist);
-        adapter = new ArrayAdapter<>(MainActivity.this,R.layout.list_item,songNames);
-        list.setAdapter(adapter);
-
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                /*If there is player before release it*/
-                if(player != null){
-                    player.release();
-                    player = null;
-                }
-                /*Create new player with selected song*/
-                player = MediaPlayer.create(MainActivity.this,
-                            Uri.parse(songPaths.get(position)));
-                /*Change current song index*/
-                curSongIndex = position;
-                /*Start new song*/
-                player.start();
-                MainActivity.this.adjustText();
-            }
-        });
     }
 
 
