@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
     private MediaPlayer player;
     private int width;
-    private int height;/*TODO:think about necessity of keeping height*/
+    private int height;
     private boolean isPlaying = false;/*TODO:Mediaplayer has method isPlaying()*/
     private ArrayList<String> songNames = new ArrayList<>();
     private ArrayList<String> songPaths = new ArrayList<>();
@@ -57,6 +57,9 @@ public class MainActivity extends AppCompatActivity {
     static final String ISPLAYERNULL = "isPaused";
     private int orientation;
     private ListView list;
+    private MediaPlayerFragment mediaPlayer;
+    private ListViewFragment songList;
+    private Bundle save;
 
 
     @Override
@@ -64,9 +67,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         orientation = this.getResources().getConfiguration().orientation;
         /*LandScape orientation*/
-        if(savedInstanceState == null){
-            this.createPlaylist();
-        }
+        this.createPlaylist();
         if(orientation == Configuration.ORIENTATION_LANDSCAPE){
             setContentView(R.layout.activity_main);
             this.setupPlayer(savedInstanceState);
@@ -75,11 +76,17 @@ public class MainActivity extends AppCompatActivity {
         else{
             /*Created first time*/
             setContentView(R.layout.fragment_container_portrait);
-            if(savedInstanceState == null){
-                /*No song playing so let user choose from list*/
-                MediaPlayerFragment mediaPlayer = new MediaPlayerFragment();
-                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,mediaPlayer).commit();
-            }
+            mediaPlayer = new MediaPlayerFragment();
+            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,mediaPlayer).commit();
+            save = savedInstanceState;
+        }
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        if(orientation == Configuration.ORIENTATION_PORTRAIT){
+            this.setupPlayer(save);
         }
     }
 
@@ -212,8 +219,16 @@ public class MainActivity extends AppCompatActivity {
         height = dimensions.y;
 
         /*Now get top textview and song textview*/
-        TextView title = (TextView) findViewById(R.id.title);
-        TextView currentSong = (TextView) findViewById(R.id.curSong);
+        TextView title;
+        TextView currentSong;
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            title = (TextView) findViewById(R.id.title);
+            currentSong = (TextView) findViewById(R.id.curSong);
+        }
+        else{
+            currentSong = mediaPlayer.getSongView();
+            title = mediaPlayer.getTitleView();
+        }
 
         /*Set sizes*/
         title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.05 * height));
