@@ -39,7 +39,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.logging.Handler;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements ListViewFragment.OnSongSelectedListener{
 
     private MediaPlayer player;
     private int width;
@@ -106,23 +107,52 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /*Implement method of interface for fragment communication*/
+    @Override
+    public void onSongSelected(int position){
+        /*Replace with new media player fragment and start song selected*/
+        mediaPlayer = new MediaPlayerFragment();
+        /*Create Bundle for fragment*/
+        Bundle args = new Bundle();
+        args.putInt(CURRENT_SONG,position);
+        args.putBoolean(ISPLAYING,isPlaying);
+        args.putBoolean(ISPLAYERNULL,false);
+        args.putInt(CURRENT_SEEKBAR_POS,0);
+        /*Set argumetns*/
+        mediaPlayer.setArguments(args);
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+
+        /*Replace and add to back stack*/
+        transaction.replace(R.id.fragment_container,mediaPlayer);
+
+        transaction.commit();
+
+        /*Change songList fragment to null since it isnt visible now*/
+        songList = null;
+        fm.executePendingTransactions();
+
+        this.setupPlayer(args);
+        this.play(null);
+    }
+
     /*Method that waits for user to choose a song to play*/
     private void waitForSong(){
         ListView playList = songList.getListView();
         adapter = new ArrayAdapter<>(MainActivity.this,R.layout.list_item,songNames);
         playList.setAdapter(adapter);
 
-        playList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        songList.waitForSongSelect();
 
-            }
-        });
     }
 
     /*Method to set up the media player and the UI*/
     private void setupPlayer( Bundle savedInstanceState){
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        if(seek == null){
+            seek = mediaPlayer.getSeekBar();
+        }
         /*Check if being recreated*/
         if(savedInstanceState != null){
             curSongIndex = savedInstanceState.getInt(CURRENT_SONG);

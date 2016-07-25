@@ -1,13 +1,20 @@
 package com.example.shalantor.mediaplayer;
 
+import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.res.ConfigurationHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 public class ListViewFragment extends Fragment {
+
+    OnSongSelectedListener mCallback;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle save){
         return inflater.inflate(R.layout.list_view_fragment,container,false);
@@ -17,7 +24,29 @@ public class ListViewFragment extends Fragment {
         return (ListView) getActivity().findViewById(R.id.playlist);
     }
 
-    public interface OnSongselectedListener{
-        void onSongSelected(int position);
+    public interface OnSongSelectedListener{
+        public void  onSongSelected(int position);
     }
+
+    @Override
+    public void onAttach(Context context){
+        super.onAttach(context);
+
+        /*instantiate mcallback method*/
+        mCallback = (OnSongSelectedListener) context;
+    }
+
+    /*Wait for the user to select a song*/
+    public void waitForSongSelect(){
+        ListView list = (ListView) getActivity().findViewById(R.id.playlist);
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                mCallback.onSongSelected(position);
+            }
+        });
+
+    }
+
 }
