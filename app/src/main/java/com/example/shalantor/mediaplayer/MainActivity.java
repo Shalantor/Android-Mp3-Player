@@ -12,6 +12,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -59,8 +60,8 @@ public class MainActivity extends AppCompatActivity {
     static final String ISPLAYERNULL = "isPaused";
     private int orientation;
     private ListView list;
-    private MediaPlayerFragment mediaPlayer;
-    private ListViewFragment songList;
+    private MediaPlayerFragment mediaPlayer = null;
+    private ListViewFragment songList = null;
     private Bundle save;
 
 
@@ -77,11 +78,17 @@ public class MainActivity extends AppCompatActivity {
             this.addListViewListener();
         }
         else{
-            /*Created first time*/
             setContentView(R.layout.fragment_container_portrait);
-            mediaPlayer = new MediaPlayerFragment();
-            getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,mediaPlayer).commit();
-            save = savedInstanceState;
+            /*Media player is being recreated*/
+            if(savedInstanceState != null) {
+                mediaPlayer = new MediaPlayerFragment();
+                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, mediaPlayer).commit();
+                save = savedInstanceState;
+            }
+            else{/*Create listView for user to choose a song*/
+                songList = new ListViewFragment();
+                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,songList).commit();
+            }
         }
     }
 
@@ -89,12 +96,31 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart(){
         super.onStart();
         if(orientation == Configuration.ORIENTATION_PORTRAIT){
-            seek = mediaPlayer.getSeekBar();
-            this.setupPlayer(save);
+            if(save != null) {
+                seek = mediaPlayer.getSeekBar();
+                this.setupPlayer(save);
+            }
+            else{
+                this.waitForSong();
+            }
         }
     }
 
-    /*Function to set up the player*/
+    /*Method that waits for user to choose a song to play*/
+    private void waitForSong(){
+        ListView playList = songList.getListView();
+        adapter = new ArrayAdapter<>(MainActivity.this,R.layout.list_item,songNames);
+        playList.setAdapter(adapter);
+
+        playList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+            }
+        });
+    }
+
+    /*Method to set up the media player and the UI*/
     private void setupPlayer( Bundle savedInstanceState){
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         /*Check if being recreated*/
@@ -374,16 +400,21 @@ public class MainActivity extends AppCompatActivity {
     public void onSaveInstanceState(Bundle save){
         /*Save current state of media player*/
         save.putInt(CURRENT_SONG,curSongIndex);
-        save.putInt(CURRENT_SEEKBAR_POS,seek.getProgress());
         save.putBoolean(ISPLAYING,isPlaying);
         save.putBoolean(ISPLAYERNULL,player == null);
-        /*Remove listener on seekbar*/
-        seek.setOnSeekBarChangeListener(null);
-        /*Remove Fragment*/
+        /*Remove Fragment if screen is in portrait mode*/
         if(orientation == Configuration.ORIENTATION_PORTRAIT) {
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
-            ft.remove(mediaPlayer);
+            /*Check which is the current active fragment*/
+            if(mediaPlayer != null) {
+                save.putInt(CURRENT_SEEKBAR_POS, seek.getProgress());
+                ft.remove(mediaPlayer);
+            }
+            else{
+                save.putInt(CURRENT_SEEKBAR_POS,0);
+                ft.remove(songList);
+            }
             ft.commit();
         }
         /*Call super class same method*/
