@@ -12,6 +12,8 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.ListViewCompat;
@@ -70,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
         this.createPlaylist();
         if(orientation == Configuration.ORIENTATION_LANDSCAPE){
             setContentView(R.layout.activity_main);
+            seek = (SeekBar) findViewById(R.id.seekbar);
             this.setupPlayer(savedInstanceState);
             this.addListViewListener();
         }
@@ -86,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart(){
         super.onStart();
         if(orientation == Configuration.ORIENTATION_PORTRAIT){
+            seek = mediaPlayer.getSeekBar();
             this.setupPlayer(save);
         }
     }
@@ -93,8 +97,6 @@ public class MainActivity extends AppCompatActivity {
     /*Function to set up the player*/
     private void setupPlayer( Bundle savedInstanceState){
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
-        /*Instantiate seekbar variable*/
-        seek = (SeekBar) findViewById(R.id.seekbar);
         /*Check if being recreated*/
         if(savedInstanceState != null){
             curSongIndex = savedInstanceState.getInt(CURRENT_SONG);
@@ -375,6 +377,15 @@ public class MainActivity extends AppCompatActivity {
         save.putInt(CURRENT_SEEKBAR_POS,seek.getProgress());
         save.putBoolean(ISPLAYING,isPlaying);
         save.putBoolean(ISPLAYERNULL,player == null);
+        /*Remove listener on seekbar*/
+        seek.setOnSeekBarChangeListener(null);
+        /*Remove Fragment*/
+        if(orientation == Configuration.ORIENTATION_PORTRAIT) {
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+            ft.remove(mediaPlayer);
+            ft.commit();
+        }
         /*Call super class same method*/
         super.onSaveInstanceState(save);
     }
