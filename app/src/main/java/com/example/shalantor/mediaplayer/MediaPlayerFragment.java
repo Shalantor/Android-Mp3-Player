@@ -17,6 +17,8 @@ public class MediaPlayerFragment extends Fragment {
         return inflater.inflate(R.layout.media_player_fragment,container,false);
     }
 
+    /*All the below functions are getter functions for components*/
+
     public TextView getSongView(){
         return (TextView) getActivity().findViewById(R.id.curSong);
     }
@@ -27,6 +29,14 @@ public class MediaPlayerFragment extends Fragment {
 
     public SeekBar getSeekBar(){
         return (SeekBar) getActivity().findViewById(R.id.seekbar);
+    }
+
+    public TextView getCurrentSongTimeView(){
+        return (TextView) getActivity().findViewById(R.id.remaining_song_time);
+    }
+
+    public TextView getSongDurationView(){
+        return (TextView) getActivity().findViewById(R.id.song_duration);
     }
 
 }

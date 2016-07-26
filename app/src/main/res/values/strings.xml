@@ -6,5 +6,5 @@
     <string name="play">Play/Pause current song</string>
     <string name="stop">Stop current song</string>
     <string name="next">Play next song </string>
-    <string name="test">Skata me auga</string>
+    <string name="empty_spaces">00:00</string>
 </resources>

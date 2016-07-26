@@ -292,19 +292,27 @@ public class MainActivity extends AppCompatActivity
         /*Now get top textview and song textview*/
         TextView title;
         TextView currentSong;
+        TextView currentSongTime;
+        TextView songDuration;
         if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
             title = (TextView) findViewById(R.id.title);
             currentSong = (TextView) findViewById(R.id.curSong);
+            currentSongTime = (TextView) findViewById(R.id.remaining_song_time);
+            songDuration = (TextView) findViewById(R.id.song_duration);
         }
         else{
             currentSong = mediaPlayer.getSongView();
             title = mediaPlayer.getTitleView();
+            currentSongTime = mediaPlayer.getCurrentSongTimeView();
+            songDuration = mediaPlayer.getSongDurationView();
         }
 
-        /*Set sizes*/
+        /*Set text font sizes of TextViews*/
         title.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.05 * height));
         currentSong.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.05 * height));
         currentSong.setSelected(true);
+        currentSongTime.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.03*height));
+        songDuration.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.03*height));
 
         /*Find out text width in pixels*/
         Rect bounds = new Rect();
