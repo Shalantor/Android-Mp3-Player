@@ -374,6 +374,7 @@ public class MainActivity extends AppCompatActivity
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                /*This is for the movement of the seekbar*/
                 /*Time to go to next song*/
                 if (seek.getProgress() == seek.getMax()) {
                     ImageButton button = (ImageButton) findViewById(R.id.next);
@@ -386,6 +387,23 @@ public class MainActivity extends AppCompatActivity
                 else{/*No song is playing , dont let user change seeker*/
                     seek.setProgress(0);
                 }
+
+                if(player != null) {
+                    /*This is for changing the text of textviews next to seekbar*/
+                    int curPos = player.getCurrentPosition() / 1000;
+                    int minutes = curPos / 60;
+                    int seconds = curPos % 60;
+
+                    TextView songTime;
+                    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                        songTime = (TextView) findViewById(R.id.remaining_song_time);
+                    } else {
+                        songTime = mediaPlayer.getCurrentSongTimeView();
+                    }
+                    String textToSet = minutes + ":" + seconds;
+                    songTime.setText(textToSet, TextView.BufferType.NORMAL);
+                }
+
                 handler.postDelayed(this,1000);
             }
         });
