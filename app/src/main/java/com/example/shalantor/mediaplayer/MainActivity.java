@@ -125,14 +125,6 @@ public class MainActivity extends AppCompatActivity
     public void onSongSelected(int position){
         /*Replace with new media player fragment and start song selected*/
         mediaPlayer = new MediaPlayerFragment();
-        /*Create Bundle for fragment*/
-        Bundle args = new Bundle();
-        args.putInt(CURRENT_SONG,position);
-        args.putBoolean(ISPLAYING,isPlaying);
-        args.putBoolean(ISPLAYERNULL,false);
-        args.putInt(CURRENT_SEEKBAR_POS,0);
-        /*Set argumetns*/
-        mediaPlayer.setArguments(args);
 
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
@@ -146,7 +138,9 @@ public class MainActivity extends AppCompatActivity
         songList = null;
         fm.executePendingTransactions();
 
-        this.setupPlayer(args);
+        /*Strt playing selected song*/
+        curSongIndex = position;
+        this.setupPlayer(null);
         this.play(null);
     }
 
