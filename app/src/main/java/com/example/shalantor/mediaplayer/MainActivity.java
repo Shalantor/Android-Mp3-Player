@@ -82,9 +82,16 @@ public class MainActivity extends AppCompatActivity
             setContentView(R.layout.fragment_container_portrait);
             /*Media player is being recreated*/
             if(savedInstanceState != null) {
-                mediaPlayer = new MediaPlayerFragment();
-                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, mediaPlayer).commit();
-                save = savedInstanceState;
+                boolean isNull = savedInstanceState.getBoolean(ISPLAYERNULL);
+                if(isNull){
+                    songList = new ListViewFragment();
+                    getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,songList).commit();
+                }
+                else {
+                    mediaPlayer = new MediaPlayerFragment();
+                    getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, mediaPlayer).commit();
+                    save = savedInstanceState;
+                }
             }
             else{/*Create listView for user to choose a song*/
                 songList = new ListViewFragment();
@@ -98,8 +105,14 @@ public class MainActivity extends AppCompatActivity
         super.onStart();
         if(orientation == Configuration.ORIENTATION_PORTRAIT){
             if(save != null) {
-                seek = mediaPlayer.getSeekBar();
-                this.setupPlayer(save);
+                boolean isNull = save.getBoolean(ISPLAYERNULL);
+                if(isNull){
+                    this.waitForSong();
+                }
+                else {
+                    seek = mediaPlayer.getSeekBar();
+                    this.setupPlayer(save);
+                }
             }
             else{
                 this.waitForSong();
@@ -446,6 +459,9 @@ public class MainActivity extends AppCompatActivity
                 ft.remove(songList);
             }
             ft.commit();
+        }
+        else{
+            save.putInt(CURRENT_SEEKBAR_POS, seek.getProgress());
         }
         /*Call super class same method*/
         super.onSaveInstanceState(save);
