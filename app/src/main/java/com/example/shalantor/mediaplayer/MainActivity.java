@@ -400,7 +400,14 @@ public class MainActivity extends AppCompatActivity
                     } else {
                         songTime = mediaPlayer.getCurrentSongTimeView();
                     }
-                    String textToSet = minutes + ":" + seconds;
+                    String middle;
+                    if(seconds < 10){
+                        middle = ":0";
+                    }
+                    else{
+                        middle = ":";
+                    }
+                    String textToSet = minutes + middle + seconds;
                     songTime.setText(textToSet, TextView.BufferType.NORMAL);
                 }
 
@@ -457,6 +464,36 @@ public class MainActivity extends AppCompatActivity
         b.performClick();
 
      }
+
+
+    /*Sets the textview text for the duration of the current song*/
+    private void setDurationText(){
+
+        TextView durationView;
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            durationView = (TextView) findViewById(R.id.song_duration);
+        }
+        else{
+            durationView = mediaPlayer.getSongDurationView();
+        }
+
+        int duration = player.getDuration() / 1000;
+        int minutes = duration / 60;
+        int seconds = duration % 60;
+
+        String middle;
+        if(seconds < 10){
+            middle = ":0";
+        }
+        else{
+            middle = ":";
+        }
+
+        String durationText = minutes + middle + seconds;
+        durationView.setText(durationText, TextView.BufferType.NORMAL);
+    }
+
+    
     /*OnDestroy function Override*/
     @Override
     public void onDestroy(){
