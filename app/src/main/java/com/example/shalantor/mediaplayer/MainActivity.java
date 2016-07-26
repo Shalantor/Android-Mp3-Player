@@ -149,7 +149,6 @@ public class MainActivity extends AppCompatActivity
         ListView playList = songList.getListView();
         adapter = new ArrayAdapter<>(MainActivity.this,R.layout.list_item,songNames);
         playList.setAdapter(adapter);
-
         songList.waitForSongSelect();
 
     }
@@ -175,6 +174,18 @@ public class MainActivity extends AppCompatActivity
                 this.adjustSeekBarMovement();
                 player.seekTo(seekPos * 1000);
                 if(isPlaying){
+                    /*Set text of animated textview*/
+                    TextView curSong;
+                    if(orientation == Configuration.ORIENTATION_LANDSCAPE){
+                        curSong = (TextView) findViewById(R.id.curSong);
+                    }
+                    else{
+                        curSong = mediaPlayer.getSongView();
+                    }
+                    curSong.setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
+                    /*Change image of button to pause*/
+                    ImageButton bt = (ImageButton) findViewById(R.id.Pause);
+                    bt.setImageResource(R.mipmap.pause);
                     player.start();
                 }
             }
@@ -314,7 +325,6 @@ public class MainActivity extends AppCompatActivity
         textPaint.getTextBounds(currentSong.getText().toString(),
                 0,currentSong.getText().toString().length(),bounds);
         int textWidth = bounds.width();
-        Log.d("HELLO","text width is: " + textWidth);
 
         /*Now animate text in song textview*/
         /*Choose start based on screen orientation*/
