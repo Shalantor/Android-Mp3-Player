@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity
     static final int MAX_VOLUME = 10;           /*Volume range is 0 - 10*/
     private final int SECONDS_TO_DISAPPEAR = 5; /*How long to show seekbar for volume*/
     private float currentVolume = (float)(Math.log(MAX_VOLUME/2)/Math.log(MAX_VOLUME));
+    private Timer timer;                        /*Timer for volume seekbar*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -492,7 +493,7 @@ public class MainActivity extends AppCompatActivity
         volumeSeekBar.setVisibility(View.VISIBLE);
 
         /*Set up a timer for the seekbar to disappear after a while*/
-        Timer timer = new Timer(false);
+        timer = new Timer(false);
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -500,6 +501,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void run() {
                         volumeSeekBar.setVisibility(View.INVISIBLE);
+                        timer = null;
                     }
                 });
             }
@@ -525,6 +527,11 @@ public class MainActivity extends AppCompatActivity
         volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int position, boolean b) {
+                /*Extend time the seekbar is visible*/
+                    if(timer != null){
+                        timer.cancel();
+                        MainActivity.this.showVolumeControl(null);
+                    }
                     currentVolume = (float)(Math.log(MAX_VOLUME - position)/Math.log(MAX_VOLUME));
                     if(player != null){
                         player.setVolume(1 - currentVolume,1 - currentVolume);
