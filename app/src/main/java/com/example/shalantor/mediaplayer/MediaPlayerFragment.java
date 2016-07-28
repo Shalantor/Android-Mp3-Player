@@ -39,4 +39,8 @@ public class MediaPlayerFragment extends Fragment {
         return (TextView) getActivity().findViewById(R.id.song_duration);
     }
 
+    public SeekBar getVolumeSeekBar(){
+        return (SeekBar) getActivity().findViewById(R.id.volumeControl);
+    }
+
 }

@@ -104,7 +104,7 @@
                 android:src="@mipmap/record"
                 android:scaleType="fitXY"
                 android:layout_weight="1"
-                android:onClick="changeVolume"
+                android:onClick="showVolumeControl"
                 />
 
             <ImageButton

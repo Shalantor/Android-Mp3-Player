@@ -37,6 +37,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity
@@ -64,7 +66,9 @@ public class MainActivity extends AppCompatActivity
     private MediaPlayerFragment mediaPlayer = null;
     private ListViewFragment songList = null;
     private Bundle save;
-
+    static final int MAX_VOLUME = 10;           /*Volume range is 0 - 10*/
+    private final int SECONDS_TO_DISAPPEAR = 5; /*How long to show seekbar for volume*/
+    private float currentVolume = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -467,10 +471,55 @@ public class MainActivity extends AppCompatActivity
 
      }
 
+    /*button function to show the seekbar for volume control*/
+    public void showVolumeControl(View view){
+        final SeekBar volumeSeekBar;
+        /*make seekbar visible*/
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE){
+            volumeSeekBar = (SeekBar) findViewById(R.id.volumeControl);
+        }
+        else{
+            volumeSeekBar = mediaPlayer.getVolumeSeekBar();
+        }
+        volumeSeekBar.setVisibility(View.VISIBLE);
 
-    /*Function for the button to change the volume of song playing*/
-    public void changeVolume(View view){
-        seek.setVisibility(View.INVISIBLE);
+        /*Set up a timer for the seekbar to disappear after a while*/
+        Timer timer = new Timer(false);
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        volumeSeekBar.setVisibility(View.INVISIBLE);
+                    }
+                });
+            }
+        },SECONDS_TO_DISAPPEAR * 1000);
+    }
+
+
+    /*Method to change the volume of song playing*/
+
+    private void changeVolume(){
+
+        /*get current volume and calculate which volume to set*/
+        currentVolume = (float)(Math.log(MAX_VOLUME - currentVolume)/Math.log(MAX_VOLUME));
+        /*Check if player is null*/
+        if (player != null){
+            player.setVolume(currentVolume,currentVolume);
+        }
+
+        SeekBar volumeSeekBar;
+        /*Now change the volume seekbar progress*/
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE){
+            volumeSeekBar = (SeekBar) findViewById(R.id.volumeControl);
+        }
+        else{
+            volumeSeekBar = mediaPlayer.getVolumeSeekBar();
+        }
+        volumeSeekBar.setProgress(Math.round(currentVolume));
+
     }
 
     /*Sets the textview text for the duration of the current song*/
