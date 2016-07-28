@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity
     protected void onStart(){
         super.onStart();
         if(orientation == Configuration.ORIENTATION_PORTRAIT){
-            if(save != null) {
+            if(save != null) {/*Show list of songs*/
                 boolean isNull = save.getBoolean(ISPLAYERNULL);
                 if(isNull){
                     this.waitForSong();
@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity
                     this.setupPlayer(save);
                 }
             }
-            else{
+            else{/*Show list of songs*/
                 this.waitForSong();
             }
         }
@@ -173,6 +173,7 @@ public class MainActivity extends AppCompatActivity
                 seek.setProgress(seekPos);
                 this.adjustSeekBarMovement();
                 player.seekTo(seekPos * 1000);
+                this.setDurationText();
                 if(isPlaying){
                     /*Set text of animated textview*/
                     TextView curSong;
@@ -360,6 +361,7 @@ public class MainActivity extends AppCompatActivity
                 songView.setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
                 this.adjustText();
                 this.adjustSeekBarMovement();
+                this.setDurationText();
             }
             button.setImageResource(R.mipmap.pause);
             player.start();
@@ -469,6 +471,7 @@ public class MainActivity extends AppCompatActivity
     /*Sets the textview text for the duration of the current song*/
     private void setDurationText(){
 
+        /*Get correspoding textview*/
         TextView durationView;
         if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
             durationView = (TextView) findViewById(R.id.song_duration);
@@ -477,10 +480,12 @@ public class MainActivity extends AppCompatActivity
             durationView = mediaPlayer.getSongDurationView();
         }
 
+        /*Get song duration in minutes and seconds*/
         int duration = player.getDuration() / 1000;
         int minutes = duration / 60;
         int seconds = duration % 60;
 
+        /*Adjust string*/
         String middle;
         if(seconds < 10){
             middle = ":0";
@@ -489,11 +494,12 @@ public class MainActivity extends AppCompatActivity
             middle = ":";
         }
 
+        /*Set text*/
         String durationText = minutes + middle + seconds;
         durationView.setText(durationText, TextView.BufferType.NORMAL);
     }
 
-    
+
     /*OnDestroy function Override*/
     @Override
     public void onDestroy(){
