@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity
             seek = (SeekBar) findViewById(R.id.seekbar);
             this.setupPlayer(savedInstanceState);
             this.addListViewListener();
+            this.setupVolumeListener();
         }
         else{
             setContentView(R.layout.fragment_container_portrait);
@@ -501,14 +502,7 @@ public class MainActivity extends AppCompatActivity
 
     /*Method to change the volume of song playing*/
 
-    private void changeVolume(){
-
-        /*get current volume and calculate which volume to set*/
-        currentVolume = (float)(Math.log(MAX_VOLUME - currentVolume)/Math.log(MAX_VOLUME));
-        /*Check if player is null*/
-        if (player != null){
-            player.setVolume(currentVolume,currentVolume);
-        }
+    private void setupVolumeListener(){
 
         SeekBar volumeSeekBar;
         /*Now change the volume seekbar progress*/
@@ -518,7 +512,29 @@ public class MainActivity extends AppCompatActivity
         else{
             volumeSeekBar = mediaPlayer.getVolumeSeekBar();
         }
-        volumeSeekBar.setProgress(Math.round(currentVolume));
+        volumeSeekBar.setMax(MAX_VOLUME);
+        volumeSeekBar.setProgress(MAX_VOLUME / 2);
+
+        volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int position, boolean b) {
+                    currentVolume = (float)(Math.log(MAX_VOLUME - position)/Math.log(MAX_VOLUME));
+                    if(player != null){
+                        player.setVolume(1 - currentVolume,1 - currentVolume);
+                    }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
 
     }
 
