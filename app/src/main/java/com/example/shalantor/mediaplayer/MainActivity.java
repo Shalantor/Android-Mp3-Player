@@ -468,6 +468,11 @@ public class MainActivity extends AppCompatActivity
      }
 
 
+    /*Function for the button to change the volume of song playing*/
+    public void changeVolume(View view){
+        seek.setVisibility(View.INVISIBLE);
+    }
+
     /*Sets the textview text for the duration of the current song*/
     private void setDurationText(){
 

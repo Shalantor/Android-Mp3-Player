@@ -20,9 +20,27 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:orientation="vertical"
-            android:id="@+id/image"
-            android:background="@mipmap/music_note"
             android:layout_weight="1">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/image"
+                android:src="@mipmap/music_note"
+                android:scaleType="fitXY"
+                android:contentDescription="@string/app_name"/>
+
+            <SeekBar
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal|bottom"
+                android:paddingStart="150sp"
+                android:paddingLeft="150sp"
+                android:paddingEnd="150sp"
+                android:paddingRight="150sp"
+                android:visibility="invisible"
+                android:id="@+id/volumeControl"/>
+
         </FrameLayout>
 
         <HorizontalScrollView
@@ -86,6 +104,7 @@
                 android:src="@mipmap/record"
                 android:scaleType="fitXY"
                 android:layout_weight="1"
+                android:onClick="changeVolume"
                 />
 
             <ImageButton
