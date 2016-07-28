@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity
     static final String CURRENT_SEEKBAR_POS = "seekPos";
     static final String ISPLAYING = "isPlaying";
     static final String ISPLAYERNULL = "isPaused";
+    static final String VOLUME = "volume";
     private int orientation;
     private ListView list;
     private MediaPlayerFragment mediaPlayer = null;
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity
     private Bundle save;
     static final int MAX_VOLUME = 10;           /*Volume range is 0 - 10*/
     private final int SECONDS_TO_DISAPPEAR = 5; /*How long to show seekbar for volume*/
-    private float currentVolume = 0;
+    private float currentVolume = (float)(Math.log(MAX_VOLUME/2)/Math.log(MAX_VOLUME));
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +109,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart(){
         super.onStart();
-        this.setupVolumeListener();
         if(orientation == Configuration.ORIENTATION_PORTRAIT){
             if(save != null) {/*Show list of songs*/
                 boolean isNull = save.getBoolean(ISPLAYERNULL);
@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity
                 else {
                     seek = mediaPlayer.getSeekBar();
                     this.setupPlayer(save);
+                    this.setupVolumeListener();
                 }
             }
             else{/*Show list of songs*/
@@ -144,9 +145,10 @@ public class MainActivity extends AppCompatActivity
         songList = null;
         fm.executePendingTransactions();
 
-        /*Strt playing selected song*/
+        /*Start playing selected song*/
         curSongIndex = position;
         this.setupPlayer(null);
+        this.setupVolumeListener();
         this.play(null);
     }
 
@@ -170,11 +172,13 @@ public class MainActivity extends AppCompatActivity
             curSongIndex = savedInstanceState.getInt(CURRENT_SONG);
             int seekPos = savedInstanceState.getInt(CURRENT_SEEKBAR_POS);
             isPlaying = savedInstanceState.getBoolean(ISPLAYING);
+            currentVolume = savedInstanceState.getFloat(VOLUME);
             boolean isPlayerNull = savedInstanceState.getBoolean(ISPLAYERNULL);
             if(!isPlayerNull){
                 player = MediaPlayer.create(MainActivity.this,
                         Uri.parse(songPaths.get(curSongIndex)));
                 int seekRange = player.getDuration() / 1000;
+                player.setVolume(1-currentVolume,1-currentVolume);
                 seek.setMax(seekRange);
                 seek.setProgress(seekPos);
                 this.adjustSeekBarMovement();
@@ -199,10 +203,6 @@ public class MainActivity extends AppCompatActivity
         }
         /*Adjust text size and movement in song textview*/
         this.adjustText();
-
-        /*Set volume*/
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC,20,0);
 
         /*Now add listener to seekbar, so that the user can change the position of audio*/
         seek.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -247,6 +247,7 @@ public class MainActivity extends AppCompatActivity
                 curSongIndex = position;
                 MainActivity.this.setDurationText();
                 /*Start new song*/
+                player.setVolume(1-currentVolume,1-currentVolume);
                 player.start();
                 MainActivity.this.adjustText();
                 MainActivity.this.adjustSeekBarMovement();
@@ -364,6 +365,7 @@ public class MainActivity extends AppCompatActivity
             if(player == null){
                 String path = songPaths.get(curSongIndex);
                 player = MediaPlayer.create(MainActivity.this,Uri.parse(path));
+                player.setVolume(1-currentVolume,1-currentVolume);
                 /*Get duration for seekbar*/
                 currentSongDuration = player.getDuration() / 1000;
                 seek.setMax(currentSongDuration);
@@ -593,6 +595,7 @@ public class MainActivity extends AppCompatActivity
         save.putInt(CURRENT_SONG,curSongIndex);
         save.putBoolean(ISPLAYING,isPlaying);
         save.putBoolean(ISPLAYERNULL,player == null);
+        save.putFloat(VOLUME,currentVolume);
         /*Remove Fragment if screen is in portrait mode*/
         if(orientation == Configuration.ORIENTATION_PORTRAIT) {
             FragmentManager fm = getSupportFragmentManager();
