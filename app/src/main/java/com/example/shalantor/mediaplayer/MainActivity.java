@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart(){
         super.onStart();
+        this.setupVolumeListener();
         if(orientation == Configuration.ORIENTATION_PORTRAIT){
             if(save != null) {/*Show list of songs*/
                 boolean isNull = save.getBoolean(ISPLAYERNULL);
@@ -244,9 +245,13 @@ public class MainActivity extends AppCompatActivity
                         Uri.parse(songPaths.get(position)));
                 /*Change current song index*/
                 curSongIndex = position;
+                MainActivity.this.setDurationText();
                 /*Start new song*/
                 player.start();
                 MainActivity.this.adjustText();
+                MainActivity.this.adjustSeekBarMovement();
+                ImageButton bt = (ImageButton) findViewById(R.id.Pause);
+                bt.setImageResource(R.mipmap.pause);
             }
         });
 
