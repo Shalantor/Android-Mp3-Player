@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity
     static final String ISPLAYING = "isPlaying";
     static final String ISPLAYERNULL = "isPaused";
     static final String VOLUME = "volume";
+    static final String VOLUMER_BAR_PROGRESS = "volumeBar";
     private int orientation;
     private ListView list;
     private MediaPlayerFragment mediaPlayer = null;
@@ -76,14 +77,14 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         orientation = this.getResources().getConfiguration().orientation;
-        /*LandScape orientation*/
+        /*Create the playlist */
         this.createPlaylist();
         if(orientation == Configuration.ORIENTATION_LANDSCAPE){
             setContentView(R.layout.activity_main);
             seek = (SeekBar) findViewById(R.id.seekbar);
+            this.setupVolumeListener();
             this.setupPlayer(savedInstanceState);
             this.addListViewListener();
-            this.setupVolumeListener();
         }
         else{
             setContentView(R.layout.fragment_container_portrait);
@@ -118,9 +119,11 @@ public class MainActivity extends AppCompatActivity
                 }
                 else {
                     seek = mediaPlayer.getSeekBar();
-                    this.setupPlayer(save);
                     this.setupVolumeListener();
+                    this.setupPlayer(save);
                 }
+                SeekBar volumeBar = mediaPlayer.getVolumeSeekBar();
+                volumeBar.setProgress(save.getInt(VOLUMER_BAR_PROGRESS));
             }
             else{/*Show list of songs*/
                 this.waitForSong();
@@ -188,12 +191,16 @@ public class MainActivity extends AppCompatActivity
                 if(isPlaying){
                     /*Set text of animated textview*/
                     TextView curSong;
+                    SeekBar volumeBar;
                     if(orientation == Configuration.ORIENTATION_LANDSCAPE){
                         curSong = (TextView) findViewById(R.id.curSong);
+                        volumeBar = (SeekBar) findViewById(R.id.volumeControl);
                     }
                     else{
                         curSong = mediaPlayer.getSongView();
+                        volumeBar = mediaPlayer.getVolumeSeekBar();
                     }
+                    volumeBar.setProgress(savedInstanceState.getInt(VOLUMER_BAR_PROGRESS));
                     curSong.setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
                     /*Change image of button to pause*/
                     ImageButton bt = (ImageButton) findViewById(R.id.Pause);
@@ -605,6 +612,8 @@ public class MainActivity extends AppCompatActivity
         save.putFloat(VOLUME,currentVolume);
         /*Remove Fragment if screen is in portrait mode*/
         if(orientation == Configuration.ORIENTATION_PORTRAIT) {
+            SeekBar volumeBar = (SeekBar) findViewById(R.id.volumeControl);
+            save.putInt(VOLUMER_BAR_PROGRESS,volumeBar.getProgress());
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             /*Check which is the current active fragment*/
@@ -620,6 +629,8 @@ public class MainActivity extends AppCompatActivity
         }
         else{
             save.putInt(CURRENT_SEEKBAR_POS, seek.getProgress());
+            SeekBar volumeBar = (SeekBar) findViewById(R.id.volumeControl);
+            save.putInt(VOLUMER_BAR_PROGRESS,volumeBar.getProgress());
         }
         /*Call super class same method*/
         super.onSaveInstanceState(save);
