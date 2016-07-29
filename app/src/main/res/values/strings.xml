@@ -7,4 +7,6 @@
     <string name="stop">Stop current song</string>
     <string name="next">Play next song </string>
     <string name="empty_spaces">0:00</string>
+    <string name="loop">Loop through a song</string>
+    <string name="show_list">Show Playlist</string>
 </resources>
