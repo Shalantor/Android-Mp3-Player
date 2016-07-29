@@ -455,6 +455,18 @@ public class MainActivity extends AppCompatActivity
         /*Empty textview that shows current song*/
         TextView currentSong = (TextView) findViewById(R.id.curSong);
         currentSong.setText("", TextView.BufferType.NORMAL);
+
+        /*Set textview of current minute and second to 0:00*/
+        TextView curTime;
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE){
+            curTime = (TextView) findViewById(R.id.remaining_song_time);
+        }
+        else{
+            curTime = mediaPlayer.getCurrentSongTimeView();
+        }
+        String s = "0:00";
+        curTime.setText(s, TextView.BufferType.NORMAL);
+
     }
 
     /*Play next song in playlist*/
