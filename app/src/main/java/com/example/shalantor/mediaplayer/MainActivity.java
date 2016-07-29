@@ -625,7 +625,12 @@ public class MainActivity extends AppCompatActivity
         /*Remove Fragment if screen is in portrait mode*/
         if(orientation == Configuration.ORIENTATION_PORTRAIT) {
             SeekBar volumeBar = (SeekBar) findViewById(R.id.volumeControl);
-            save.putInt(VOLUMER_BAR_PROGRESS,volumeBar.getProgress());
+            if(volumeBar != null) {
+                save.putInt(VOLUMER_BAR_PROGRESS, volumeBar.getProgress());
+            }
+            else{
+                save.putInt(VOLUMER_BAR_PROGRESS,MAX_VOLUME / 2);
+            }
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             /*Check which is the current active fragment*/
