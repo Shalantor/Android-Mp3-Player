@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity
     static final String ISPLAYERNULL = "isPaused";
     static final String VOLUME = "volume";
     static final String VOLUMER_BAR_PROGRESS = "volumeBar";
+    static final String IS_LOOPING = "isLooping";
     private int orientation;
     private ListView list;
     private MediaPlayerFragment mediaPlayer = null;
@@ -80,6 +81,10 @@ public class MainActivity extends AppCompatActivity
         orientation = this.getResources().getConfiguration().orientation;
         /*Create the playlist */
         this.createPlaylist();
+        /*Do some basic instantiations for which orientation doesnt matter*/
+        if(savedInstanceState != null){
+            isRepeating = savedInstanceState.getBoolean(IS_LOOPING);
+        }
         if(orientation == Configuration.ORIENTATION_LANDSCAPE){
             setContentView(R.layout.activity_main);
             seek = (SeekBar) findViewById(R.id.seekbar);
@@ -635,6 +640,7 @@ public class MainActivity extends AppCompatActivity
         save.putBoolean(ISPLAYING,isPlaying);
         save.putBoolean(ISPLAYERNULL,player == null);
         save.putFloat(VOLUME,currentVolume);
+        save.putBoolean(IS_LOOPING,isRepeating);
         /*Remove Fragment if screen is in portrait mode*/
         if(orientation == Configuration.ORIENTATION_PORTRAIT) {
             SeekBar volumeBar = (SeekBar) findViewById(R.id.volumeControl);
