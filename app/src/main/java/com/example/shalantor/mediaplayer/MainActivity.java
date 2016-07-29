@@ -72,6 +72,7 @@ public class MainActivity extends AppCompatActivity
     private final int SECONDS_TO_DISAPPEAR = 5; /*How long to show seekbar for volume*/
     private float currentVolume = (float)(Math.log(MAX_VOLUME/2)/Math.log(MAX_VOLUME));
     private Timer timer;                        /*Timer for volume seekbar*/
+    private boolean isRepeating = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -399,8 +400,15 @@ public class MainActivity extends AppCompatActivity
                 /*This is for the movement of the seekbar*/
                 /*Time to go to next song*/
                 if (seek.getProgress() == seek.getMax()) {
-                    ImageButton button = (ImageButton) findViewById(R.id.next);
-                    button.performClick();
+                    if(!isRepeating) {
+                        ImageButton button = (ImageButton) findViewById(R.id.next);
+                        button.performClick();
+                    }
+                    else{
+                        player.seekTo(0);
+                        seek.setProgress(0);
+                        player.start();
+                    }
                 }
                 else if(player != null){/*Update seeker position*/
                     int curPos = player.getCurrentPosition() / 1000;
@@ -600,6 +608,11 @@ public class MainActivity extends AppCompatActivity
         /*Set text*/
         String durationText = minutes + middle + seconds;
         durationView.setText(durationText, TextView.BufferType.NORMAL);
+    }
+
+    /*Method to repeat song*/
+    public void repeat(View view){
+        isRepeating = !isRepeating;
     }
 
 
