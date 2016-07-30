@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <ProgressBar
+        android:layout_width="match_parent"
+        android:layout_height="20sp"
+        android:id="@+id/progressBar"
+        android:layout_gravity="center_horizontal"
+        android:maxHeight="20sp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@mipmap/previous"
+            android:id="@+id/list_previous"
+            android:scaleType="fitXY"
+            android:contentDescription="@string/previous" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@mipmap/play"
+            android:id="@+id/list_play"
+            android:scaleType="fitXY"
+            android:contentDescription="@string/play" />
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:background="@mipmap/next"
+            android:id="@+id/list_next"
+            android:scaleType="fitXY"
+            android:contentDescription="@string/next" />
+
+    </LinearLayout>
+
+</LinearLayout>
