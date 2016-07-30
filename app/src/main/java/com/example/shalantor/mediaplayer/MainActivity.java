@@ -149,6 +149,7 @@ public class MainActivity extends AppCompatActivity
 
         /*make layout with buttons invisible*/
         LinearLayout layout = songList.getButtonsBar();
+        /*TODO:check if this is neccessary*/
         layout.setVisibility(View.GONE);
 
         /*Replace and add to back stack*/
@@ -663,6 +664,61 @@ public class MainActivity extends AppCompatActivity
         }
 
     }
+
+    /*The following methods are used for the buttons
+      in the list view where the user can reselect a song while
+      already listening to another on. They basically are a simpler
+       version of the play,next and previous song methods.
+     */
+
+    /*Play song*/
+    public void simplePlay(View view){
+        ImageButton button = (ImageButton) findViewById(R.id.simple_play);
+        if(isPlaying){
+            button.setImageResource(R.mipmap.play);
+            player.pause();
+        }
+        else{
+            button.setImageResource(R.mipmap.pause);
+            player.start();
+        }
+        isPlaying = !isPlaying;
+    }
+
+    /*Play previous song*/
+    public void simplePrevious(View view){
+        curSongIndex = ((curSongIndex - 1) + numSongs) % numSongs;
+
+        if(player!=null) {
+            player.release();
+            player = null;
+        }
+        isPlaying = true;
+
+        player = MediaPlayer.create(MainActivity.this,Uri.parse(songPaths.get(curSongIndex)));
+        player.setVolume(currentVolume,currentVolume);
+        player.start();
+
+    }
+
+    /*Play next song*/
+    public void simpleNext(View view){
+        curSongIndex = ((curSongIndex - 1) + numSongs) % numSongs;
+
+        if(player!=null) {
+            player.release();
+            player = null;
+        }
+        isPlaying = true;
+
+        player = MediaPlayer.create(MainActivity.this,Uri.parse(songPaths.get(curSongIndex)));
+        player.setVolume(currentVolume,currentVolume);
+        player.start();
+
+    }
+
+
+
 
 
     /*OnDestroy function Override*/

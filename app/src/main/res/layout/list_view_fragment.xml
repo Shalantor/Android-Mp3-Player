@@ -43,15 +43,19 @@
                 android:background="@mipmap/previous"
                 android:scaleType="fitXY"
                 android:contentDescription="@string/previous"
-                android:layout_weight="0.15"/>
+                android:layout_weight="0.15"
+                android:id="@+id/simple_previous"
+                android:onClick="simplePrevious"/>
 
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:background="@mipmap/play"
+                android:background="@mipmap/pause"
                 android:scaleType="fitXY"
                 android:contentDescription="@string/play"
-                android:layout_weight="0.15"/>
+                android:layout_weight="0.15"
+                android:id="@+id/simple_play"
+                android:onClick="simplePlay"/>
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -59,7 +63,9 @@
                 android:background="@mipmap/next"
                 android:scaleType="fitXY"
                 android:contentDescription="@string/next"
-                android:layout_weight="0.15"/>
+                android:layout_weight="0.15"
+                android:id="@+id/simple_next"
+                android:onClick="simpleNext"/>
 
         </LinearLayout>
 
