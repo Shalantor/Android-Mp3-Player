@@ -402,48 +402,46 @@ public class MainActivity extends AppCompatActivity
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                /*This is for the movement of the seekbar*/
-                /*Time to go to next song*/
-                if (seek.getProgress() == seek.getMax()) {
-                    if(!isRepeating) {
-                        ImageButton button = (ImageButton) findViewById(R.id.next);
-                        button.performClick();
-                    }
-                    else{
-                        player.seekTo(0);
+                if(songList == null) {
+                    /*This is for the movement of the seekbar*/
+                    /*Time to go to next song*/
+                    if (seek.getProgress() == seek.getMax()) {
+                        if (!isRepeating) {
+                            ImageButton button = (ImageButton) findViewById(R.id.next);
+                            button.performClick();
+                        } else {
+                            player.seekTo(0);
+                            seek.setProgress(0);
+                            player.start();
+                        }
+                    } else if (player != null) {/*Update seeker position*/
+                        int curPos = player.getCurrentPosition() / 1000;
+                        seek.setProgress(curPos);
+                    } else {/*No song is playing , dont let user change seeker*/
                         seek.setProgress(0);
-                        player.start();
                     }
-                }
-                else if(player != null){/*Update seeker position*/
-                    int curPos = player.getCurrentPosition() / 1000;
-                    seek.setProgress(curPos);
-                }
-                else{/*No song is playing , dont let user change seeker*/
-                    seek.setProgress(0);
-                }
 
-                if(player != null) {
-                    /*This is for changing the text of textviews next to seekbar*/
-                    int curPos = player.getCurrentPosition() / 1000;
-                    int minutes = curPos / 60;
-                    int seconds = curPos % 60;
+                    if (player != null) {
+                        /*This is for changing the text of textviews next to seekbar*/
+                        int curPos = player.getCurrentPosition() / 1000;
+                        int minutes = curPos / 60;
+                        int seconds = curPos % 60;
 
-                    TextView songTime;
-                    if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                        songTime = (TextView) findViewById(R.id.remaining_song_time);
-                    } else {
-                        songTime = mediaPlayer.getCurrentSongTimeView();
+                        TextView songTime;
+                        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                            songTime = (TextView) findViewById(R.id.remaining_song_time);
+                        } else {
+                            songTime = mediaPlayer.getCurrentSongTimeView();
+                        }
+                        String middle;
+                        if (seconds < 10) {
+                            middle = ":0";
+                        } else {
+                            middle = ":";
+                        }
+                        String textToSet = minutes + middle + seconds;
+                        songTime.setText(textToSet, TextView.BufferType.NORMAL);
                     }
-                    String middle;
-                    if(seconds < 10){
-                        middle = ":0";
-                    }
-                    else{
-                        middle = ":";
-                    }
-                    String textToSet = minutes + middle + seconds;
-                    songTime.setText(textToSet, TextView.BufferType.NORMAL);
                 }
 
                 handler.postDelayed(this,1000);
@@ -618,6 +616,24 @@ public class MainActivity extends AppCompatActivity
     /*Method to repeat song*/
     public void repeat(View view){
         isRepeating = !isRepeating;
+    }
+
+    /*method to show list view with songs*/
+    public void showPlaylist(View view){
+        /*Replace with listview*/
+        songList = new ListViewFragment();
+
+        FragmentManager fm = getSupportFragmentManager();
+        FragmentTransaction transaction = fm.beginTransaction();
+
+        /*Replace and add to back stack*/
+        transaction.replace(R.id.fragment_container,songList);
+
+        transaction.commit();
+        fm.executePendingTransactions();
+
+        this.waitForSong();
+
     }
 
 

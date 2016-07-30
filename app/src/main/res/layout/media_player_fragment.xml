@@ -75,7 +75,8 @@
                 android:src="@mipmap/record"
                 android:scaleType="fitXY"
                 style="?android:attr/buttonBarButtonStyle"
-                android:layout_weight="0.3"/>
+                android:layout_weight="0.3"
+                android:onClick="showPlaylist"/>
 
 
 
