@@ -14,12 +14,45 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
-        <ImageButton
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:background="@mipmap/previous" />
+        <SeekBar
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/list_player_seekbar"/>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@mipmap/previous"
+                android:scaleType="fitXY"
+                android:contentDescription="@string/previous"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@mipmap/play"
+                android:scaleType="fitXY"
+                android:contentDescription="@string/play"/>
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:background="@mipmap/next"
+                android:scaleType="fitXY"
+                android:contentDescription="@string/next"/>
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>
