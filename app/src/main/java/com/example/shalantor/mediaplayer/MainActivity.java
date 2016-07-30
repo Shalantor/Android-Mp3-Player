@@ -155,6 +155,12 @@ public class MainActivity extends AppCompatActivity
         songList = null;
         fm.executePendingTransactions();
 
+        if(player != null){
+            player.release();
+            player = null;
+            isPlaying = false;
+        }
+
         /*Start playing selected song*/
         curSongIndex = position;
         this.setupPlayer(null);
