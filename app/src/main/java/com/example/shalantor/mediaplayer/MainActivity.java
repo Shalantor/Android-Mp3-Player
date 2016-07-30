@@ -159,6 +159,7 @@ public class MainActivity extends AppCompatActivity
             player.release();
             player = null;
             isPlaying = false;
+            seek = mediaPlayer.getSeekBar();
         }
 
         /*Start playing selected song*/
@@ -626,19 +627,23 @@ public class MainActivity extends AppCompatActivity
 
     /*method to show list view with songs*/
     public void showPlaylist(View view){
-        /*Replace with listview*/
-        songList = new ListViewFragment();
 
-        FragmentManager fm = getSupportFragmentManager();
-        FragmentTransaction transaction = fm.beginTransaction();
+        /*If in landscape do nothing*/
+        if(orientation == Configuration.ORIENTATION_PORTRAIT) {
+            /*Replace with listview*/
+            songList = new ListViewFragment();
 
-        /*Replace and add to back stack*/
-        transaction.replace(R.id.fragment_container,songList);
+            FragmentManager fm = getSupportFragmentManager();
+            FragmentTransaction transaction = fm.beginTransaction();
 
-        transaction.commit();
-        fm.executePendingTransactions();
+            /*Replace and add to back stack*/
+            transaction.replace(R.id.fragment_container, songList);
 
-        this.waitForSong();
+            transaction.commit();
+            fm.executePendingTransactions();
+
+            this.waitForSong();
+        }
 
     }
 
