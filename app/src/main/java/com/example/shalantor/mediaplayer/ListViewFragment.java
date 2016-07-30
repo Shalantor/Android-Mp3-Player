@@ -9,7 +9,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 
 public class ListViewFragment extends Fragment {
 
@@ -49,4 +51,13 @@ public class ListViewFragment extends Fragment {
 
     }
 
+    /*Getter for textview with song name*/
+    public TextView getNameTextView(){
+        return (TextView) getActivity().findViewById(R.id.list_show_song);
+    }
+
+    /*Getter for linearlayout with buttons*/
+    public LinearLayout getButtonsBar(){
+        return (LinearLayout) getActivity().findViewById(R.id.button_bar);
+    }
 }

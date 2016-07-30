@@ -15,7 +15,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:visibility="gone">
+        android:layout_weight="0.05"
+        android:visibility="gone"
+        android:id="@+id/button_bar">
 
         <SeekBar
             android:layout_width="match_parent"
@@ -25,31 +27,39 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
 
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:id="@+id/list_show_song"
+                android:textSize="50sp"/>
 
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:background="@mipmap/previous"
                 android:scaleType="fitXY"
-                android:contentDescription="@string/previous"/>
+                android:contentDescription="@string/previous"
+                android:layout_weight="0.15"/>
 
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:background="@mipmap/play"
                 android:scaleType="fitXY"
-                android:contentDescription="@string/play"/>
+                android:contentDescription="@string/play"
+                android:layout_weight="0.15"/>
 
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:background="@mipmap/next"
                 android:scaleType="fitXY"
-                android:contentDescription="@string/next"/>
+                android:contentDescription="@string/next"
+                android:layout_weight="0.15"/>
 
         </LinearLayout>
 

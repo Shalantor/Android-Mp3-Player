@@ -27,6 +27,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -146,21 +147,27 @@ public class MainActivity extends AppCompatActivity
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
 
+        /*make layout with buttons invisible*/
+        LinearLayout layout = songList.getButtonsBar();
+        layout.setVisibility(View.GONE);
+
         /*Replace and add to back stack*/
         transaction.replace(R.id.fragment_container,mediaPlayer);
 
-        transaction.commit();
-
         /*Change songList fragment to null since it isnt visible now*/
         songList = null;
+
+        transaction.commit();
+
         fm.executePendingTransactions();
 
         if(player != null){
             player.release();
             player = null;
             isPlaying = false;
-            seek = mediaPlayer.getSeekBar();
         }
+        seek = mediaPlayer.getSeekBar();
+
 
         /*Start playing selected song*/
         curSongIndex = position;
@@ -641,6 +648,16 @@ public class MainActivity extends AppCompatActivity
 
             transaction.commit();
             fm.executePendingTransactions();
+
+            /*Check if song is playing*/
+            if(player != null) {
+                /*Set linearlayout visible*/
+                LinearLayout layout = songList.getButtonsBar();
+                layout.setVisibility(View.VISIBLE);
+                /*Set text of name view*/
+                TextView txt = songList.getNameTextView();
+                txt.setText(songNames.get(curSongIndex));
+            }
 
             this.waitForSong();
         }
