@@ -669,6 +669,7 @@ public class MainActivity extends AppCompatActivity
                 songSeek.setMax(player.getDuration() / 1000);
             }
 
+            mediaPlayer = null;
             this.waitForSong();
         }
 
@@ -767,7 +768,12 @@ public class MainActivity extends AppCompatActivity
                 ft.remove(mediaPlayer);
             }
             else{
-                save.putInt(CURRENT_SEEKBAR_POS,0);
+                if(player == null) {
+                    save.putInt(CURRENT_SEEKBAR_POS, 0);
+                }
+                else{
+                    save.putInt(CURRENT_SEEKBAR_POS,songList.getSeekBar().getProgress());
+                }
                 ft.remove(songList);
             }
             ft.commit();
