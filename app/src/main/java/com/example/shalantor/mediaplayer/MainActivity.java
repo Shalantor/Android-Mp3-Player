@@ -458,6 +458,13 @@ public class MainActivity extends AppCompatActivity
                         songTime.setText(textToSet, TextView.BufferType.NORMAL);
                     }
                 }
+                else{
+                    if(player != null) {
+                        SeekBar songSeek = songList.getSeekBar();
+                        int curPos = player.getCurrentPosition() / 1000;
+                        songSeek.setProgress(curPos);
+                    }
+                }
 
                 handler.postDelayed(this,1000);
             }
@@ -658,6 +665,8 @@ public class MainActivity extends AppCompatActivity
                 /*Set text of name view*/
                 TextView txt = songList.getNameTextView();
                 txt.setText(songNames.get(curSongIndex));
+                SeekBar songSeek = songList.getSeekBar();
+                songSeek.setMax(player.getDuration() / 1000);
             }
 
             this.waitForSong();
