@@ -23,8 +23,8 @@
             android:paddingLeft="150sp"
             android:paddingEnd="150sp"
             android:paddingRight="150sp"
-            android:visibility="invisible"
-            android:id="@+id/list_volume_control"/>
+            android:id="@+id/list_volume_control"
+            android:max="10"/>
 
     </FrameLayout>
 
@@ -33,7 +33,8 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_weight="0.05"
-        android:id="@+id/button_bar">
+        android:id="@+id/button_bar"
+        android:visibility="gone">
 
         <SeekBar
             android:layout_width="match_parent"

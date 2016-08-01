@@ -66,4 +66,9 @@ public class ListViewFragment extends Fragment {
     public SeekBar getSeekBar(){
         return (SeekBar) getActivity().findViewById(R.id.list_player_seekbar);
     }
+
+    /*Get volume seekbar*/
+    public SeekBar getVolumeSeekbar(){
+        return (SeekBar) getActivity().findViewById(R.id.list_volume_control);
+    }
 }

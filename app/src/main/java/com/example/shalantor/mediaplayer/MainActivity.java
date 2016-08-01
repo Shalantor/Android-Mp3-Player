@@ -144,6 +144,9 @@ public class MainActivity extends AppCompatActivity
         /*Replace with new media player fragment and start song selected*/
         mediaPlayer = new MediaPlayerFragment();
 
+        /*Get progress of volumebar*/
+        int volumeProgress = songList.getVolumeSeekbar().getProgress();
+
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
 
@@ -162,10 +165,12 @@ public class MainActivity extends AppCompatActivity
 
         fm.executePendingTransactions();
 
+        boolean setVolumeProgress = false;
         if(player != null){
             player.release();
             player = null;
             isPlaying = false;
+            setVolumeProgress = true;
         }
         seek = mediaPlayer.getSeekBar();
 
@@ -175,6 +180,11 @@ public class MainActivity extends AppCompatActivity
         this.setupPlayer(null);
         this.setupVolumeListener();
         this.play(null);
+
+        /*Set progress of volume seekbar*/
+        if(setVolumeProgress) {
+            mediaPlayer.getVolumeSeekBar().setProgress(volumeProgress);
+        }
     }
 
     /*Method that waits for user to choose a song to play*/
@@ -648,6 +658,9 @@ public class MainActivity extends AppCompatActivity
             /*Replace with listview*/
             songList = new ListViewFragment();
 
+            /*Get progress of volume seekbar for later*/
+            int volumeProgress = mediaPlayer.getVolumeSeekBar().getProgress();
+
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction transaction = fm.beginTransaction();
 
@@ -667,6 +680,7 @@ public class MainActivity extends AppCompatActivity
                 txt.setText(songNames.get(curSongIndex));
                 SeekBar songSeek = songList.getSeekBar();
                 songSeek.setMax(player.getDuration() / 1000);
+                songList.getVolumeSeekbar().setProgress(volumeProgress);
             }
 
             mediaPlayer = null;
