@@ -1,6 +1,8 @@
 package com.example.shalantor.mediaplayer;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Paint;
@@ -22,6 +24,7 @@ import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -86,6 +89,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
         orientation = this.getResources().getConfiguration().orientation;
         /*Create the playlist */
         this.createPlaylist();
@@ -206,7 +210,6 @@ public class MainActivity extends AppCompatActivity
 
     /*Method to set up the media player and the UI*/
     private void setupPlayer( Bundle savedInstanceState){
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         /*Listener for swipes*/
         detector = new GestureDetector(this,new MyGestureDetector());
@@ -859,6 +862,23 @@ public class MainActivity extends AppCompatActivity
                 }
             }
             return false;
+        }
+    }
+
+
+    /*Inner class used for getting hardware key input*/
+
+    class RemoteControlReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent){
+
+            if( Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())){
+                KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                if(KeyEvent.KEYCODE_MEDIA_PLAY == event.getKeyCode()){
+                    Log.d("TEMP","temp");
+                }
+            }
+
         }
     }
 
