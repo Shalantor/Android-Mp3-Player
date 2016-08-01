@@ -21,12 +21,15 @@ import android.support.v7.widget.ListViewCompat;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -75,6 +78,10 @@ public class MainActivity extends AppCompatActivity
     private float currentVolume = (float)(Math.log(MAX_VOLUME/2)/Math.log(MAX_VOLUME));
     private Timer timer;                        /*Timer for volume seekbar*/
     private boolean isRepeating = false;
+    private static final int SWIPE_MIN_DISTANCE = 120;
+    private static final int SWIPE_MAX_OFF_PATH = 250;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    private GestureDetector detector ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,6 +93,7 @@ public class MainActivity extends AppCompatActivity
         if(savedInstanceState != null){
             isRepeating = savedInstanceState.getBoolean(IS_LOOPING);
         }
+
         if(orientation == Configuration.ORIENTATION_LANDSCAPE){
             setContentView(R.layout.activity_main);
             seek = (SeekBar) findViewById(R.id.seekbar);
@@ -199,6 +207,21 @@ public class MainActivity extends AppCompatActivity
     /*Method to set up the media player and the UI*/
     private void setupPlayer( Bundle savedInstanceState){
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        /*Listener for swipes*/
+        detector = new GestureDetector(this,new MyGestureDetector());
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE ||
+                getSupportFragmentManager().findFragmentById(R.id.player) != null) {
+            ImageView musicNoteImage = (ImageView) findViewById(R.id.image);
+            musicNoteImage.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View view, MotionEvent motionEvent) {
+                    detector.onTouchEvent(motionEvent);
+                    return true;
+                }
+            });
+        }
+
         if(seek == null){
             seek = mediaPlayer.getSeekBar();
         }
@@ -805,6 +828,38 @@ public class MainActivity extends AppCompatActivity
         }
         /*Call super class same method*/
         super.onSaveInstanceState(save);
+    }
+
+    /*Inner class to detect swipe gestures to right and left
+      for going to next or previous song
+     */
+
+    class MyGestureDetector extends android.view.GestureDetector.SimpleOnGestureListener{
+
+        @Override
+        public boolean onFling(MotionEvent e1,MotionEvent e2, float velocityX, float velocityY){
+
+            if(Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH){/*Too much Y distance between swipe start and end*/
+                return false;
+            }
+            /*Right to left swipe*/
+            if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY){
+                if(MainActivity.this.orientation == Configuration.ORIENTATION_LANDSCAPE
+                        || MainActivity.this.getSupportFragmentManager().findFragmentById(R.id.player) != null) {
+                    MainActivity.this.nextSong(null);
+                    return true;
+                }
+            }
+            /*Left to right swipe*/
+            else if(e2.getX() - e1.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > SWIPE_THRESHOLD_VELOCITY){
+                if(MainActivity.this.orientation == Configuration.ORIENTATION_LANDSCAPE
+                        || MainActivity.this.getSupportFragmentManager().findFragmentById(R.id.player) != null) {
+                    MainActivity.this.prevSong(null);
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 
 }
