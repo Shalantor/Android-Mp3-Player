@@ -772,7 +772,13 @@ public class MainActivity extends AppCompatActivity
                 save.putInt(VOLUMER_BAR_PROGRESS, volumeBar.getProgress());
             }
             else{
-                save.putInt(VOLUMER_BAR_PROGRESS,MAX_VOLUME / 2);
+                if(player == null) {
+                    save.putInt(VOLUMER_BAR_PROGRESS, MAX_VOLUME / 2);
+                }
+                else{/*Extended list fragment case*/
+                    volumeBar = songList.getVolumeSeekbar();
+                    save.putInt(VOLUMER_BAR_PROGRESS,volumeBar.getProgress());
+                }
             }
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();

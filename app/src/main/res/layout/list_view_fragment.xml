@@ -24,7 +24,8 @@
             android:paddingEnd="150sp"
             android:paddingRight="150sp"
             android:id="@+id/list_volume_control"
-            android:max="10"/>
+            android:max="10"
+            android:visibility="gone"/>
 
     </FrameLayout>
 
