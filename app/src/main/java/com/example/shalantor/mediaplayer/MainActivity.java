@@ -304,7 +304,10 @@ public class MainActivity extends AppCompatActivity
                     ImageButton bt = (ImageButton) findViewById(R.id.Pause);
                     bt.setImageResource(R.mipmap.pause);
 
-                    player.start();
+                    if(this.requestFocus()) {
+                        player.start();
+                    }
+
                 }
             }
         }
@@ -355,7 +358,9 @@ public class MainActivity extends AppCompatActivity
                 MainActivity.this.setDurationText();
                 /*Start new song*/
                 player.setVolume(1-currentVolume,1-currentVolume);
-                player.start();
+                if(MainActivity.this.requestFocus()) {
+                    player.start();
+                }
                 MainActivity.this.adjustText();
                 MainActivity.this.adjustSeekBarMovement();
                 ImageButton bt = (ImageButton) findViewById(R.id.Pause);
@@ -521,7 +526,9 @@ public class MainActivity extends AppCompatActivity
                 this.setDurationText();
             }
             button.setImageResource(R.mipmap.pause);
-            player.start();
+            if(this.requestFocus()) {
+                player.start();
+            }
         }
         /*Change value to opposite*/
         isPlaying = !isPlaying;
@@ -543,7 +550,9 @@ public class MainActivity extends AppCompatActivity
                         } else {
                             player.seekTo(0);
                             seek.setProgress(0);
-                            player.start();
+                            if(MainActivity.this.requestFocus()) {
+                                player.start();
+                            }
                         }
                     } else if (player != null) {/*Update seeker position*/
                         int curPos = player.getCurrentPosition() / 1000;
@@ -626,6 +635,7 @@ public class MainActivity extends AppCompatActivity
         String s = "0:00";
         curTime.setText(s, TextView.BufferType.NORMAL);
 
+        am.abandonAudioFocus(afChangeListener);
     }
 
     /*Play next song in playlist*/
@@ -820,7 +830,9 @@ public class MainActivity extends AppCompatActivity
         }
         else{
             button.setImageResource(R.mipmap.pause);
-            player.start();
+            if(this.requestFocus()) {
+                player.start();
+            }
         }
         isPlaying = !isPlaying;
     }
@@ -837,7 +849,9 @@ public class MainActivity extends AppCompatActivity
 
         player = MediaPlayer.create(MainActivity.this,Uri.parse(songPaths.get(curSongIndex)));
         player.setVolume(currentVolume,currentVolume);
-        player.start();
+        if(this.requestFocus()) {
+            player.start();
+        }
 
         /*Update text of textview*/
         songList.getNameTextView().setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
@@ -856,7 +870,9 @@ public class MainActivity extends AppCompatActivity
 
         player = MediaPlayer.create(MainActivity.this,Uri.parse(songPaths.get(curSongIndex)));
         player.setVolume(currentVolume,currentVolume);
-        player.start();
+        if(this.requestFocus()) {
+            player.start();
+        }
 
         /*Update teext of textview*/
         songList.getNameTextView().setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
