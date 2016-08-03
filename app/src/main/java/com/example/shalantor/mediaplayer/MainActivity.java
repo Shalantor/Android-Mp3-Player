@@ -11,7 +11,9 @@ import android.graphics.Rect;
 import android.media.AudioManager;
 import android.media.Image;
 import android.media.MediaPlayer;
+import android.media.session.MediaSession;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
@@ -89,9 +91,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        /*register broadcastreceiver*/
-        AudioManager am = (AudioManager) MainActivity.this.getSystemService(Context.AUDIO_SERVICE);
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         orientation = this.getResources().getConfiguration().orientation;
@@ -875,23 +874,6 @@ public class MainActivity extends AppCompatActivity
                 }
             }
             return false;
-        }
-    }
-
-
-    /*Inner class used for getting hardware key input*/
-
-    class RemoteControlReceiver extends BroadcastReceiver {
-        @Override
-        public void onReceive(Context context, Intent intent){
-
-            if( Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())){
-                KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-                if(KeyEvent.KEYCODE_VOLUME_DOWN == event.getKeyCode()){
-                    MainActivity.this.play(null);
-                }
-            }
-
         }
     }
 
