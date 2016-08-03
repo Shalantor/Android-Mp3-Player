@@ -343,12 +343,12 @@ public class MainActivity extends AppCompatActivity
                     String path = cursor.getString(cursor
                             .getColumnIndex(MediaStore.Audio.Media.DATA));
 
+                    /*Remove file extension from songname*/
+                    int dotPosition = songName.lastIndexOf('.');
+                    if(dotPosition == songName.length() - 4){/*Can remove extension*/
+                        songName = songName.substring(0,songName.length() - 4);
+                    }
 
-                    /*String albumName = cursor.getString(cursor
-                            .getColumnIndex(MediaStore.Audio.Media.ALBUM));
-                    int albumId = cursor
-                            .getInt(cursor
-                                    .getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));*/
                     songNames.add(songName);
                     songPaths.add(path);
                 }while(cursor.moveToNext());
