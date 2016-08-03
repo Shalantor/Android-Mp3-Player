@@ -41,7 +41,6 @@ public class MainActivity extends AppCompatActivity
     private boolean isPlaying = false;/*TODO:Mediaplayer has method isPlaying()*/
     private ArrayList<String> songNames = new ArrayList<>();
     private ArrayList<String> songPaths = new ArrayList<>();
-    private final static String MEDIA_PATH = "/sdcard/";
     private int numSongs;
     private int curSongIndex;
     private android.os.Handler handler = new android.os.Handler();
@@ -525,7 +524,12 @@ public class MainActivity extends AppCompatActivity
                     if(player != null) {
                         SeekBar songSeek = songList.getSeekBar();
                         if(songSeek.getMax() == songSeek.getProgress()){
-                            MainActivity.this.simpleNext(null);
+                            if(!isRepeating) {
+                                MainActivity.this.simpleNext(null);
+                            }
+                            else{
+                                MainActivity.this.simplePlay(null);
+                            }
                             songSeek.setProgress(0);
                         }
                         else {
