@@ -89,6 +89,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        /*register broadcastreceiver*/
+        AudioManager am = (AudioManager) MainActivity.this.getSystemService(Context.AUDIO_SERVICE);
+
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         orientation = this.getResources().getConfiguration().orientation;
         /*Create the playlist */
@@ -495,8 +499,12 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
                 else{
-                    if(player != null) {
-                        SeekBar songSeek = songList.getSeekBar();
+                    SeekBar songSeek = songList.getSeekBar();
+                    if(songSeek.getProgress() == songSeek.getMax()){
+                        songSeek.setProgress(0);
+                        MainActivity.this.simpleNext(null);
+                    }
+                    else if(player != null) {
                         int curPos = player.getCurrentPosition() / 1000;
                         songSeek.setProgress(curPos);
                     }
@@ -749,6 +757,9 @@ public class MainActivity extends AppCompatActivity
         player.setVolume(currentVolume,currentVolume);
         player.start();
 
+        /*Update text of textview*/
+        songList.getNameTextView().setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
+
     }
 
     /*Play next song*/
@@ -765,6 +776,8 @@ public class MainActivity extends AppCompatActivity
         player.setVolume(currentVolume,currentVolume);
         player.start();
 
+        /*Update teext of textview*/
+        songList.getNameTextView().setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
     }
 
 
@@ -874,8 +887,8 @@ public class MainActivity extends AppCompatActivity
 
             if( Intent.ACTION_MEDIA_BUTTON.equals(intent.getAction())){
                 KeyEvent event = intent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
-                if(KeyEvent.KEYCODE_MEDIA_PLAY == event.getKeyCode()){
-                    Log.d("TEMP","temp");
+                if(KeyEvent.KEYCODE_VOLUME_DOWN == event.getKeyCode()){
+                    MainActivity.this.play(null);
                 }
             }
 
