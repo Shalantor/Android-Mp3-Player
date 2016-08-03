@@ -1,6 +1,8 @@
 package com.example.shalantor.mediaplayer;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -38,7 +40,7 @@ public class MainActivity extends AppCompatActivity
         implements ListViewFragment.OnSongSelectedListener{
 
     private MediaPlayer player;
-    private boolean isPlaying = false;/*TODO:Mediaplayer has method isPlaying()*/
+    private boolean isPlaying = false;
     private ArrayList<String> songNames = new ArrayList<>();
     private ArrayList<String> songPaths = new ArrayList<>();
     private int numSongs;
@@ -981,6 +983,23 @@ public class MainActivity extends AppCompatActivity
                 }
             }
             return false;
+        }
+    }
+
+    private class NoisyAudioStreamReceiver extends BroadcastReceiver{
+        @Override
+        public void onReceive(Context context,Intent intent){
+            if(AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())){
+                if(player != null && isPlaying){
+                    if(MainActivity.this.orientation == Configuration.ORIENTATION_LANDSCAPE
+                            || MainActivity.this.getSupportFragmentManager().findFragmentById(R.id.player) != null) {
+                        MainActivity.this.play(null);
+                    }
+                    else{
+                        MainActivity.this.simplePlay(null);
+                    }
+                }
+            }
         }
     }
 
