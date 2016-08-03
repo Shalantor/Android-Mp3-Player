@@ -188,6 +188,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /*Method to request audio focus*/
+    private boolean requestFocus(){
+        int result = am.requestAudioFocus(afChangeListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
+
+        return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+    }
+
     /*Implement method of interface for fragment communication*/
     @Override
     public void onSongSelected(int position){
