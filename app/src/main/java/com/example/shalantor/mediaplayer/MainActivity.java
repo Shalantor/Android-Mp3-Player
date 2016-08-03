@@ -3,6 +3,7 @@ package com.example.shalantor.mediaplayer;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Paint;
@@ -39,7 +40,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-
 import org.w3c.dom.Text;
 
 import java.io.File;
@@ -86,6 +86,9 @@ public class MainActivity extends AppCompatActivity
     private static final int SWIPE_MIN_DISTANCE = 120;
     private static final int SWIPE_MAX_OFF_PATH = 250;
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    private static final String LIST_SIZE = "size";
+    private static final String ITEM = "item";
+    private static final String PATH = "path";
     private GestureDetector detector ;
 
     @Override
@@ -94,8 +97,15 @@ public class MainActivity extends AppCompatActivity
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         orientation = this.getResources().getConfiguration().orientation;
+
         /*Create the playlist */
-        this.createPlaylist();
+        if(savedInstanceState == null) {
+            this.createPlaylist();
+        }
+        else{
+            this.retrievePlaylist();
+        }
+
         /*Do some basic instantiations for which orientation doesnt matter*/
         if(savedInstanceState != null){
             isRepeating = savedInstanceState.getBoolean(IS_LOOPING);
@@ -355,7 +365,43 @@ public class MainActivity extends AppCompatActivity
             }
         }
         numSongs = songNames.size();
+    }
 
+    /*retrieves playlist from shared preferences so that it is not created again every time*/
+    private void retrievePlaylist(){
+        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+        int size = preferences.getInt(LIST_SIZE,0);
+        String listItem;
+        String itemPath;
+
+        /*Loop through items of preferences*/
+        for(int i = 0; i < size; i++){
+            listItem = preferences.getString(ITEM + i,null);
+            itemPath = preferences.getString(PATH + i,null);
+            songNames.add(listItem);
+            songPaths.add(itemPath);
+        }
+    }
+
+    /*Method to save the playlist into sharedpreferences*/
+    private  void savePlaylist(){
+        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        int size = songNames.size();
+
+        /*No need to save, data is saved already*/
+        if(preferences.contains(LIST_SIZE)){
+            return;
+        }
+
+        editor.putInt(LIST_SIZE,size);
+
+        for(int i = 0; i < size; i++){
+            editor.putString(ITEM + i,songNames.get(i));
+            editor.putString(PATH + i,songPaths.get(i));
+        }
+
+        editor.apply();
     }
 
 
@@ -498,12 +544,8 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
                 else{
-                    SeekBar songSeek = songList.getSeekBar();
-                    if(songSeek.getProgress() == songSeek.getMax()){
-                        songSeek.setProgress(0);
-                        MainActivity.this.simpleNext(null);
-                    }
-                    else if(player != null) {
+                    if(player != null) {
+                        SeekBar songSeek = songList.getSeekBar();
                         int curPos = player.getCurrentPosition() / 1000;
                         songSeek.setProgress(curPos);
                     }
@@ -788,9 +830,13 @@ public class MainActivity extends AppCompatActivity
     public void onDestroy(){
         super.onDestroy();
         /*Stop method tracing*/
-        if(player != null){
+        if (player != null) {
             player.release();
             player = null;
+        }
+        if(isFinishing()) {
+            /*delete preferences*/
+            getPreferences(Context.MODE_PRIVATE).edit().clear().apply();
         }
     }
 
@@ -841,6 +887,10 @@ public class MainActivity extends AppCompatActivity
             SeekBar volumeBar = (SeekBar) findViewById(R.id.volumeControl);
             save.putInt(VOLUMER_BAR_PROGRESS,volumeBar.getProgress());
         }
+
+        /*Save playlist*/
+        this.savePlaylist();
+
         /*Call super class same method*/
         super.onSaveInstanceState(save);
     }
