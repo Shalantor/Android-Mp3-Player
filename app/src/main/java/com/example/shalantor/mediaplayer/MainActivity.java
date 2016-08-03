@@ -69,16 +69,61 @@ public class MainActivity extends AppCompatActivity
     private static final String ITEM = "item";
     private static final String PATH = "path";
     private GestureDetector detector ;
+    private AudioManager.OnAudioFocusChangeListener afChangeListener;
+    private AudioManager am;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        /*Set audio stream */
-        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
         /*Get screen orientation*/
         orientation = this.getResources().getConfiguration().orientation;
+
+        /*Set audio stream and instantiate audiochangelistener*/
+        setVolumeControlStream(AudioManager.STREAM_MUSIC);
+        am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+
+        /*Setup audiofocus listener*/
+        afChangeListener = new AudioManager.OnAudioFocusChangeListener(){
+            public void onAudioFocusChange(int focusChange){
+                if(focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT){
+                    if(player != null && isPlaying) {
+                        if (orientation == Configuration.ORIENTATION_LANDSCAPE ||
+                                getSupportFragmentManager().findFragmentById(R.id.player) != null) {
+                            MainActivity.this.play(null);
+                        }
+                        else{
+                            MainActivity.this.simplePlay(null);
+                        }
+                    }
+                }
+                else if(focusChange == AudioManager.AUDIOFOCUS_GAIN){
+                    if(player != null && !isPlaying) {
+                        if (orientation == Configuration.ORIENTATION_LANDSCAPE ||
+                                getSupportFragmentManager().findFragmentById(R.id.player) != null) {
+                            MainActivity.this.play(null);
+                        }
+                        else{
+                            MainActivity.this.simplePlay(null);
+                        }
+                    }
+                }
+                else if(focusChange == AudioManager.AUDIOFOCUS_LOSS){
+                    am.abandonAudioFocus(afChangeListener);
+                    if (orientation == Configuration.ORIENTATION_LANDSCAPE ||
+                            getSupportFragmentManager().findFragmentById(R.id.player) != null) {
+                        MainActivity.this.stop(null);
+                    }
+                    else{
+                        if(player != null){
+                            player.release();
+                            player = null;
+                        }
+                    }
+                }
+            }
+        };
+
 
         /*Create the playlist */
         if(savedInstanceState == null) {
@@ -251,6 +296,7 @@ public class MainActivity extends AppCompatActivity
                     /*Change image of button to pause*/
                     ImageButton bt = (ImageButton) findViewById(R.id.Pause);
                     bt.setImageResource(R.mipmap.pause);
+
                     player.start();
                 }
             }
