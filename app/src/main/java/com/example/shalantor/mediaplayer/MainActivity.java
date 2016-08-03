@@ -74,28 +74,29 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /*Set audio stream */
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
+
+        /*Get screen orientation*/
         orientation = this.getResources().getConfiguration().orientation;
 
         /*Create the playlist */
         if(savedInstanceState == null) {
             this.createPlaylist();
         }
-        else{
+        else{/*If recreated retrieve playlist from SharedPreferences*/
             this.retrievePlaylist();
-        }
-
-        /*Do some basic instantiations for which orientation doesnt matter*/
-        if(savedInstanceState != null){
+            /*Get loop status*/
             isRepeating = savedInstanceState.getBoolean(IS_LOOPING);
         }
 
+        /*if screen is horizontal*/
         if(orientation == Configuration.ORIENTATION_LANDSCAPE){
             setContentView(R.layout.activity_main);
-            seek = (SeekBar) findViewById(R.id.seekbar);
-            this.setupVolumeListener();
-            this.setupPlayer(savedInstanceState);
-            this.addListViewListener();
+            seek = (SeekBar) findViewById(R.id.seekbar);            /*Instantiate seekbar*/
+            this.setupVolumeListener();                             /*listener for volume seekbar*/
+            this.setupPlayer(savedInstanceState);                   /*setup player*/
+            this.addListViewListener();                             /*listener for playlist right of player*/
         }
         else{
             setContentView(R.layout.fragment_container_portrait);
@@ -109,10 +110,10 @@ public class MainActivity extends AppCompatActivity
                 else {
                     mediaPlayer = new MediaPlayerFragment();
                     getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, mediaPlayer).commit();
-                    save = savedInstanceState;
+                    save = savedInstanceState; /*Will be used in onStart to setupPlayer*/
                 }
             }
-            else{/*Create listView for user to choose a song*/
+            else{/*Create listView for user to choose a song,since no song is playing*/
                 songList = new ListViewFragment();
                 getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,songList).commit();
             }
