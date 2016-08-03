@@ -381,6 +381,7 @@ public class MainActivity extends AppCompatActivity
             songNames.add(listItem);
             songPaths.add(itemPath);
         }
+        numSongs = size;
     }
 
     /*Method to save the playlist into sharedpreferences*/
@@ -546,11 +547,16 @@ public class MainActivity extends AppCompatActivity
                 else{
                     if(player != null) {
                         SeekBar songSeek = songList.getSeekBar();
-                        int curPos = player.getCurrentPosition() / 1000;
-                        songSeek.setProgress(curPos);
+                        if(songSeek.getMax() == songSeek.getProgress()){
+                            MainActivity.this.simpleNext(null);
+                            songSeek.setProgress(0);
+                        }
+                        else {
+                            int curPos = player.getCurrentPosition() / 1000;
+                            songSeek.setProgress(curPos);
+                        }
                     }
                 }
-
                 handler.postDelayed(this,1000);
             }
         });
