@@ -1,8 +1,6 @@
 package com.example.shalantor.mediaplayer;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -10,24 +8,16 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.AudioManager;
-import android.media.Image;
 import android.media.MediaPlayer;
-import android.media.session.MediaSession;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.support.v7.widget.ListViewCompat;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.Animation;
@@ -40,27 +30,18 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
-import org.w3c.dom.Text;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity
         implements ListViewFragment.OnSongSelectedListener{
 
     private MediaPlayer player;
-    private int width;
-    private int height;
     private boolean isPlaying = false;/*TODO:Mediaplayer has method isPlaying()*/
     private ArrayList<String> songNames = new ArrayList<>();
     private ArrayList<String> songPaths = new ArrayList<>();
-    private final static String MEDIA_PATH = new String("/sdcard/");
-    private int currentSongDuration;
+    private final static String MEDIA_PATH = "/sdcard/";
     private int numSongs;
     private int curSongIndex;
     private android.os.Handler handler = new android.os.Handler();
@@ -74,12 +55,11 @@ public class MainActivity extends AppCompatActivity
     static final String VOLUMER_BAR_PROGRESS = "volumeBar";
     static final String IS_LOOPING = "isLooping";
     private int orientation;
-    private ListView list;
     private MediaPlayerFragment mediaPlayer = null;
     private ListViewFragment songList = null;
     private Bundle save;
     static final int MAX_VOLUME = 10;           /*Volume range is 0 - 10*/
-    private final int SECONDS_TO_DISAPPEAR = 5; /*How long to show seekbar for volume*/
+    private final static int SECONDS_TO_DISAPPEAR = 5; /*How long to show seekbar for volume*/
     private float currentVolume = (float)(Math.log(MAX_VOLUME/2)/Math.log(MAX_VOLUME));
     private Timer timer;                        /*Timer for volume seekbar*/
     private boolean isRepeating = false;
@@ -175,10 +155,6 @@ public class MainActivity extends AppCompatActivity
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
 
-        /*make layout with buttons invisible*/
-        LinearLayout layout = songList.getButtonsBar();
-        /*TODO:check if this is neccessary*/
-        layout.setVisibility(View.GONE);
 
         /*Replace and add to back stack*/
         transaction.replace(R.id.fragment_container,mediaPlayer);
@@ -306,7 +282,7 @@ public class MainActivity extends AppCompatActivity
     /*Adds listener to listview when in landscape orientation*/
     private void addListViewListener(){
         /*New create listview and add listener*/
-        list = (ListView) findViewById(R.id.playlist);
+        ListView list = (ListView) findViewById(R.id.playlist);
         adapter = new ArrayAdapter<>(MainActivity.this,R.layout.list_item,songNames);
         list.setAdapter(adapter);
 
@@ -363,6 +339,7 @@ public class MainActivity extends AppCompatActivity
                     songPaths.add(path);
                 }while(cursor.moveToNext());
             }
+            cursor.close();
         }
         numSongs = songNames.size();
     }
@@ -418,8 +395,8 @@ public class MainActivity extends AppCompatActivity
         display.getSize(dimensions);
 
         /*Now get each dimension*/
-        width = dimensions.x;
-        height = dimensions.y;
+        int width = dimensions.x;
+        int height = dimensions.y;
 
         /*Now get top textview and song textview*/
         TextView title;
@@ -482,7 +459,7 @@ public class MainActivity extends AppCompatActivity
                 player = MediaPlayer.create(MainActivity.this,Uri.parse(path));
                 player.setVolume(1-currentVolume,1-currentVolume);
                 /*Get duration for seekbar*/
-                currentSongDuration = player.getDuration() / 1000;
+                int currentSongDuration = player.getDuration() / 1000;
                 seek.setMax(currentSongDuration);
                 TextView songView = (TextView) findViewById(R.id.curSong);
                 songView.setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
