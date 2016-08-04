@@ -11,6 +11,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.AudioManager;
+import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -783,6 +784,19 @@ public class MainActivity extends AppCompatActivity
 
     /*Method to repeat song*/
     public void repeat(View view){
+        ImageButton bt ;
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE ){
+            bt = (ImageButton) findViewById(R.id.loop_song);
+        }
+        else{
+            bt = mediaPlayer.getVolumeButton();
+        }
+        if(isRepeating){
+            bt.setImageResource(R.mipmap.repeat_not_active);
+        }
+        else{
+            bt.setImageResource(R.mipmap.repeat_active);
+        }
         isRepeating = !isRepeating;
     }
 
