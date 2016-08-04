@@ -3,6 +3,7 @@ package com.example.shalantor.mediaplayer;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -73,6 +74,8 @@ public class MainActivity extends AppCompatActivity
     private GestureDetector detector ;
     private AudioManager.OnAudioFocusChangeListener afChangeListener;
     private AudioManager am;
+    private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+    private NoisyAudioStreamReceiver noisyReceiver = new NoisyAudioStreamReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +118,7 @@ public class MainActivity extends AppCompatActivity
                     if (orientation == Configuration.ORIENTATION_LANDSCAPE ||
                             getSupportFragmentManager().findFragmentById(R.id.player) != null) {
                         MainActivity.this.stop(null);
+                        unregisterReceiver(noisyReceiver);
                     }
                     else{
                         if(player != null){
@@ -307,6 +311,7 @@ public class MainActivity extends AppCompatActivity
                     bt.setImageResource(R.mipmap.pause);
 
                     if(this.requestFocus()) {
+                        registerReceiver(noisyReceiver,intentFilter);
                         player.start();
                     }
 
@@ -361,6 +366,7 @@ public class MainActivity extends AppCompatActivity
                 /*Start new song*/
                 player.setVolume(1-currentVolume,1-currentVolume);
                 if(MainActivity.this.requestFocus()) {
+                    registerReceiver(noisyReceiver,intentFilter);
                     player.start();
                 }
                 MainActivity.this.adjustText();
@@ -529,6 +535,7 @@ public class MainActivity extends AppCompatActivity
             }
             button.setImageResource(R.mipmap.pause);
             if(this.requestFocus()) {
+                registerReceiver(noisyReceiver,intentFilter);
                 player.start();
             }
         }
@@ -553,6 +560,7 @@ public class MainActivity extends AppCompatActivity
                             player.seekTo(0);
                             seek.setProgress(0);
                             if(MainActivity.this.requestFocus()) {
+                                registerReceiver(noisyReceiver,intentFilter);
                                 player.start();
                             }
                         }
@@ -833,6 +841,7 @@ public class MainActivity extends AppCompatActivity
         else{
             button.setImageResource(R.mipmap.pause);
             if(this.requestFocus()) {
+                registerReceiver(noisyReceiver,intentFilter);
                 player.start();
             }
         }
@@ -852,6 +861,7 @@ public class MainActivity extends AppCompatActivity
         player = MediaPlayer.create(MainActivity.this,Uri.parse(songPaths.get(curSongIndex)));
         player.setVolume(currentVolume,currentVolume);
         if(this.requestFocus()) {
+            registerReceiver(noisyReceiver,intentFilter);
             player.start();
         }
 
@@ -873,6 +883,7 @@ public class MainActivity extends AppCompatActivity
         player = MediaPlayer.create(MainActivity.this,Uri.parse(songPaths.get(curSongIndex)));
         player.setVolume(currentVolume,currentVolume);
         if(this.requestFocus()) {
+            registerReceiver(noisyReceiver,intentFilter);
             player.start();
         }
 
