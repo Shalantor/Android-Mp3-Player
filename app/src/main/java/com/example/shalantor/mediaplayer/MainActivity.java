@@ -11,7 +11,6 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.AudioManager;
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -19,6 +18,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -119,7 +119,12 @@ public class MainActivity extends AppCompatActivity
                     if (orientation == Configuration.ORIENTATION_LANDSCAPE ||
                             getSupportFragmentManager().findFragmentById(R.id.player) != null) {
                         MainActivity.this.stop(null);
-                        unregisterReceiver(noisyReceiver);
+                        try {
+                            unregisterReceiver(noisyReceiver);
+                        }
+                        catch(IllegalArgumentException ex){
+                            Log.d("NOT REGISTERED","receiver is not registered");
+                        }
                     }
                     else{
                         if(player != null){
@@ -233,7 +238,10 @@ public class MainActivity extends AppCompatActivity
             setVolumeProgress = true;
         }
         seek = mediaPlayer.getSeekBar();
-
+        if(isRepeating){
+            ImageButton bt = mediaPlayer.getVolumeButton();
+            bt.setImageResource(R.mipmap.repeat_active);
+        }
 
         /*Start playing selected song*/
         curSongIndex = position;
@@ -276,6 +284,7 @@ public class MainActivity extends AppCompatActivity
         if(seek == null){
             seek = mediaPlayer.getSeekBar();
         }
+
         /*Check if being recreated*/
         if(savedInstanceState != null){
             curSongIndex = savedInstanceState.getInt(CURRENT_SONG);
@@ -294,16 +303,23 @@ public class MainActivity extends AppCompatActivity
                 player.seekTo(seekPos * 1000);
                 this.setDurationText();
                 if(isPlaying){
-                    /*Set text of animated textview*/
+                    /*Set text of animated textview and image of repeat button*/
                     TextView curSong;
                     SeekBar volumeBar;
+                    ImageButton button;
                     if(orientation == Configuration.ORIENTATION_LANDSCAPE){
                         curSong = (TextView) findViewById(R.id.curSong);
                         volumeBar = (SeekBar) findViewById(R.id.volumeControl);
+                        button = (ImageButton) findViewById(R.id.loop_song);
                     }
                     else{
                         curSong = mediaPlayer.getSongView();
                         volumeBar = mediaPlayer.getVolumeSeekBar();
+                        button = mediaPlayer.getVolumeButton();
+                    }
+                    boolean loops = savedInstanceState.getBoolean(IS_LOOPING);
+                    if(loops){
+                        button.setImageResource(R.mipmap.repeat_active);
                     }
                     volumeBar.setProgress(savedInstanceState.getInt(VOLUMER_BAR_PROGRESS));
                     curSong.setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
