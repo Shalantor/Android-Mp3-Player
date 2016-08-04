@@ -42,14 +42,15 @@ public class MainActivity extends AppCompatActivity
         implements ListViewFragment.OnSongSelectedListener{
 
     private MediaPlayer player;
-    private boolean isPlaying = false;
+    private boolean isPlaying = false;                              /*is player playing something?*/
     private ArrayList<String> songNames = new ArrayList<>();
     private ArrayList<String> songPaths = new ArrayList<>();
     private int numSongs;
-    private int curSongIndex;
-    private android.os.Handler handler = new android.os.Handler();
-    private SeekBar seek ;
-    private ArrayAdapter<String> adapter;
+    private int curSongIndex;                                       /*Index of current song*/
+    private android.os.Handler handler = new android.os.Handler();  /*Handler for extra thread on UI*/
+    private SeekBar seek ;                                          /*Seekbar which shows song progress*/
+    private ArrayAdapter<String> adapter;                           /*Adapter to populate listview with items*/
+    /*Various strings used as bundle tags*/
     static final String CURRENT_SONG = "curSong";
     static final String CURRENT_SEEKBAR_POS = "seekPos";
     static final String ISPLAYING = "isPlaying";
@@ -57,26 +58,29 @@ public class MainActivity extends AppCompatActivity
     static final String VOLUME = "volume";
     static final String VOLUMER_BAR_PROGRESS = "volumeBar";
     static final String IS_LOOPING = "isLooping";
-    private int orientation;
+    private int orientation;                                        /*Orientation of screen*/
     private MediaPlayerFragment mediaPlayer = null;
     private ListViewFragment songList = null;
-    private Bundle save;
-    static final int MAX_VOLUME = 10;           /*Volume range is 0 - 10*/
-    private final static int SECONDS_TO_DISAPPEAR = 5; /*How long to show seekbar for volume*/
-    private float currentVolume = (float)(Math.log(MAX_VOLUME/2)/Math.log(MAX_VOLUME));
-    private Timer timer;                        /*Timer for volume seekbar*/
-    private boolean isRepeating = false;
+    private Bundle save;                                            /*Used when portrait mode is active*/
+    static final int MAX_VOLUME = 10;                               /*Volume range is 0 - 10*/
+    private final static int SECONDS_TO_DISAPPEAR = 5;              /*How long to show seekbar for volume*/
+    private float currentVolume = (float)(Math.log(MAX_VOLUME/2)
+                                    /Math.log(MAX_VOLUME));         /*Starting volume*/
+    private Timer timer;                                            /*Timer for volume seekbar*/
+    private boolean isRepeating = false;                            /*Is song on repeat mode?*/
+    /*Constants for swiping*/
     private static final int SWIPE_MIN_DISTANCE = 120;
     private static final int SWIPE_MAX_OFF_PATH = 250;
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+    /*Constants for recreating play list */
     private static final String LIST_SIZE = "size";
     private static final String ITEM = "item";
     private static final String PATH = "path";
-    private GestureDetector detector ;
-    private AudioManager.OnAudioFocusChangeListener afChangeListener;
+    private GestureDetector detector ;                              /*Detects swipes*/
+    private AudioManager.OnAudioFocusChangeListener afChangeListener;/*Listener for audio focus*/
     private AudioManager am;
     private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-    private NoisyAudioStreamReceiver noisyReceiver = new NoisyAudioStreamReceiver();
+    private NoisyAudioStreamReceiver noisyReceiver = new NoisyAudioStreamReceiver();   
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -632,7 +636,6 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
-
 
     /*Stop current song*/
     public void stop(View view){
