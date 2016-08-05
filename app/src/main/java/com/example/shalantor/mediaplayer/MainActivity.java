@@ -80,7 +80,8 @@ public class MainActivity extends AppCompatActivity
     private AudioManager.OnAudioFocusChangeListener afChangeListener;/*Listener for audio focus*/
     private AudioManager am;
     private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
-    private NoisyAudioStreamReceiver noisyReceiver = new NoisyAudioStreamReceiver();   
+    private NoisyAudioStreamReceiver noisyReceiver = new NoisyAudioStreamReceiver();
+    private boolean isRegistered = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,11 +124,9 @@ public class MainActivity extends AppCompatActivity
                     if (orientation == Configuration.ORIENTATION_LANDSCAPE ||
                             getSupportFragmentManager().findFragmentById(R.id.player) != null) {
                         MainActivity.this.stop(null);
-                        try {
+                        if(isRegistered) {
                             unregisterReceiver(noisyReceiver);
-                        }
-                        catch(IllegalArgumentException ex){
-                            Log.d("NOT REGISTERED","receiver is not registered");
+                            isRegistered = false;
                         }
                     }
                     else{
@@ -333,6 +332,7 @@ public class MainActivity extends AppCompatActivity
 
                     if(this.requestFocus()) {
                         registerReceiver(noisyReceiver,intentFilter);
+                        isRegistered = true;
                         player.start();
                     }
 
@@ -388,6 +388,7 @@ public class MainActivity extends AppCompatActivity
                 player.setVolume(1-currentVolume,1-currentVolume);
                 if(MainActivity.this.requestFocus()) {
                     registerReceiver(noisyReceiver,intentFilter);
+                    isRegistered = true;
                     player.start();
                 }
                 MainActivity.this.adjustText();
@@ -539,6 +540,10 @@ public class MainActivity extends AppCompatActivity
         if(isPlaying){
             button.setImageResource(R.mipmap.play);
             player.pause();
+            if(isRegistered) {
+                unregisterReceiver(noisyReceiver);
+                isRegistered = false;
+            }
         }
         else{
             if(player == null){
@@ -557,6 +562,7 @@ public class MainActivity extends AppCompatActivity
             button.setImageResource(R.mipmap.pause);
             if(this.requestFocus()) {
                 registerReceiver(noisyReceiver,intentFilter);
+                isRegistered = true;
                 player.start();
             }
         }
@@ -582,6 +588,7 @@ public class MainActivity extends AppCompatActivity
                             seek.setProgress(0);
                             if(MainActivity.this.requestFocus()) {
                                 registerReceiver(noisyReceiver,intentFilter);
+                                isRegistered = true;
                                 player.start();
                             }
                         }
@@ -870,11 +877,16 @@ public class MainActivity extends AppCompatActivity
         if(isPlaying){
             button.setImageResource(R.mipmap.play);
             player.pause();
+            if(isRegistered) {
+                unregisterReceiver(noisyReceiver);
+                isRegistered = false;
+            }
         }
         else{
             button.setImageResource(R.mipmap.pause);
             if(this.requestFocus()) {
                 registerReceiver(noisyReceiver,intentFilter);
+                isRegistered = true;
                 player.start();
             }
         }
@@ -895,6 +907,7 @@ public class MainActivity extends AppCompatActivity
         player.setVolume(currentVolume,currentVolume);
         if(this.requestFocus()) {
             registerReceiver(noisyReceiver,intentFilter);
+            isRegistered = true;
             player.start();
         }
 
@@ -917,16 +930,13 @@ public class MainActivity extends AppCompatActivity
         player.setVolume(currentVolume,currentVolume);
         if(this.requestFocus()) {
             registerReceiver(noisyReceiver,intentFilter);
+            isRegistered = true;
             player.start();
         }
 
         /*Update teext of textview*/
         songList.getNameTextView().setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
     }
-
-
-
-
 
     /*OnDestroy function Override*/
     @Override
@@ -940,6 +950,10 @@ public class MainActivity extends AppCompatActivity
         if(isFinishing()) {
             /*delete preferences*/
             getPreferences(Context.MODE_PRIVATE).edit().clear().apply();
+        }
+        if(isRegistered) {
+            unregisterReceiver(noisyReceiver);
+            isRegistered = false;
         }
     }
 
