@@ -41,7 +41,7 @@
         <SeekBar
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/list_player_seekbar"/>
+            android:id="@+id/list_player_seekbar" />
 
 
         <LinearLayout
@@ -54,7 +54,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:id="@+id/list_show_song"
-                android:textSize="50sp"/>
+                android:textSize="50sp"
+                android:textColor="@color/white" />
 
             <ImageButton
                 android:layout_width="wrap_content"
@@ -64,7 +65,7 @@
                 android:contentDescription="@string/previous"
                 android:layout_weight="0.15"
                 android:id="@+id/simple_previous"
-                android:onClick="simplePrevious"/>
+                android:onClick="simplePrevious" />
 
             <ImageButton
                 android:layout_width="wrap_content"

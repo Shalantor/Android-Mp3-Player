@@ -15,7 +15,8 @@
             android:layout_height="wrap_content"
             android:text="@string/gkplayer"
             android:gravity="center"
-            android:id="@+id/title" />
+            android:id="@+id/title"
+            android:textColor="@color/white"/>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -96,7 +97,8 @@
                 android:ellipsize="marquee"
                 android:maxLines="1"
                 android:marqueeRepeatLimit="marquee_forever"
-                android:scrollHorizontally="true"/>
+                android:scrollHorizontally="true"
+                android:textColor="@color/white"/>
         </HorizontalScrollView>
 
 
@@ -110,7 +112,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/remaining_song_time"
-                android:text="@string/empty_spaces"/>
+                android:text="@string/empty_spaces"
+                android:textColor="@color/white"/>
 
             <SeekBar
                 android:layout_width="0dp"
@@ -122,7 +125,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/song_duration"
-                android:text="@string/empty_spaces"/>
+                android:text="@string/empty_spaces"
+                android:textColor="@color/white"/>
 
         </LinearLayout>
 
