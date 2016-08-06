@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity
     static final String VOLUME = "volume";
     static final String VOLUMER_BAR_PROGRESS = "volumeBar";
     static final String IS_LOOPING = "isLooping";
+    static final String IS_SHUFFLING = "isShuffling";
     private int orientation;                                        /*Orientation of screen*/
     private MediaPlayerFragment mediaPlayer = null;
     private ListViewFragment songList = null;
@@ -149,6 +150,8 @@ public class MainActivity extends AppCompatActivity
             this.retrievePlaylist();
             /*Get loop status*/
             isRepeating = savedInstanceState.getBoolean(IS_LOOPING);
+            /*get shuffle status*/
+            isShuffling = savedInstanceState.getBoolean(IS_SHUFFLING);
         }
 
         /*if screen is horizontal*/
@@ -242,9 +245,15 @@ public class MainActivity extends AppCompatActivity
             setVolumeProgress = true;
         }
         seek = mediaPlayer.getSeekBar();
+
         if(isRepeating){
             ImageButton bt = mediaPlayer.getVolumeButton();
             bt.setImageResource(R.mipmap.repeat_active);
+        }
+
+        if(isShuffling){
+            ImageButton button = mediaPlayer.getShuffleButton();
+            button.setImageResource(R.mipmap.shuffle_active);
         }
 
         /*Start playing selected song*/
@@ -310,20 +319,29 @@ public class MainActivity extends AppCompatActivity
                     /*Set text of animated textview and image of repeat button*/
                     TextView curSong;
                     SeekBar volumeBar;
-                    ImageButton button;
+                    ImageButton volButton;
+                    ImageButton shuffleButton;
                     if(orientation == Configuration.ORIENTATION_LANDSCAPE){
                         curSong = (TextView) findViewById(R.id.curSong);
                         volumeBar = (SeekBar) findViewById(R.id.volumeControl);
-                        button = (ImageButton) findViewById(R.id.loop_song);
+                        volButton = (ImageButton) findViewById(R.id.loop_song);
+                        shuffleButton = (ImageButton) findViewById(R.id.shuffle);
                     }
                     else{
                         curSong = mediaPlayer.getSongView();
                         volumeBar = mediaPlayer.getVolumeSeekBar();
-                        button = mediaPlayer.getVolumeButton();
+                        volButton = mediaPlayer.getVolumeButton();
+                        shuffleButton = mediaPlayer.getShuffleButton();
                     }
+
                     boolean loops = savedInstanceState.getBoolean(IS_LOOPING);
                     if(loops){
-                        button.setImageResource(R.mipmap.repeat_active);
+                        volButton.setImageResource(R.mipmap.repeat_active);
+                    }
+
+                    boolean shuffles = savedInstanceState.getBoolean(IS_SHUFFLING);
+                    if(shuffles){
+                        shuffleButton.setImageResource(R.mipmap.shuffle_active);
                     }
                     volumeBar.setProgress(savedInstanceState.getInt(VOLUMER_BAR_PROGRESS));
                     curSong.setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
@@ -1018,6 +1036,7 @@ public class MainActivity extends AppCompatActivity
         save.putBoolean(ISPLAYERNULL,player == null);
         save.putFloat(VOLUME,currentVolume);
         save.putBoolean(IS_LOOPING,isRepeating);
+        save.putBoolean(IS_SHUFFLING,isShuffling);
         /*Remove Fragment if screen is in portrait mode*/
         if(orientation == Configuration.ORIENTATION_PORTRAIT) {
             SeekBar volumeBar = (SeekBar) findViewById(R.id.volumeControl);
