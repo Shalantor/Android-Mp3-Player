@@ -234,6 +234,7 @@ public class MainActivity extends AppCompatActivity
         };
     }
 
+
     /*Method to request audio focus before starting playback*/
     private boolean requestFocus(){
         int result = am.requestAudioFocus(afChangeListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
@@ -241,7 +242,8 @@ public class MainActivity extends AppCompatActivity
         return result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
     }
 
-    /*Implement method of interface for fragment communication*/
+
+    /*Implement method of interface for fragment communication when choosing a song from list view in portair mode*/
     @Override
     public void onSongSelected(int position){
         /*Replace with new media player fragment and start song selected*/
@@ -262,9 +264,12 @@ public class MainActivity extends AppCompatActivity
 
         transaction.commit();
 
+        /*needed for further setup of variables*/
         fm.executePendingTransactions();
 
-        boolean setVolumeProgress = false;
+        boolean setVolumeProgress = false;          /*flag*/
+
+        /*If song was playing stop it and release player resources*/
         if(player != null){
             player.release();
             player = null;
@@ -273,17 +278,17 @@ public class MainActivity extends AppCompatActivity
         }
         seek = mediaPlayer.getSeekBar();
 
-        if(isRepeating){
+        if(isRepeating){                                            /*Set correct image of button if repeat mode is active*/
             ImageButton bt = mediaPlayer.getVolumeButton();
             bt.setImageResource(R.mipmap.repeat_active);
         }
 
         if(isShuffling){
-            ImageButton button = mediaPlayer.getShuffleButton();
+            ImageButton button = mediaPlayer.getShuffleButton();    /*Set correct image of button if repeat mode is active*/
             button.setImageResource(R.mipmap.shuffle_active);
         }
 
-        /*Start playing selected song*/
+        /*Start playing selected song after setting up the player and everything necessary*/
         curSongIndex = position;
         this.setupPlayer(null);
         this.setupVolumeListener();
@@ -295,14 +300,16 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /*Method that waits for user to choose a song to play*/
+
+    /*Method that waits for user to choose a song to play when in portrait view and showing the list of songs*/
     private void waitForSong(){
         ListView playList = songList.getListView();
-        adapter = new ArrayAdapter<>(MainActivity.this,R.layout.list_item,songNames);
-        playList.setAdapter(adapter);
+        adapter = new ArrayAdapter<>(MainActivity.this,R.layout.list_item,songNames);               /*adapter for list*/
+        playList.setAdapter(adapter);                                                               /*Populate list with song names*/
         songList.waitForSongSelect();
 
     }
+
 
     /*Method to set up the media player and the UI*/
     private void setupPlayer( Bundle savedInstanceState){
@@ -310,9 +317,9 @@ public class MainActivity extends AppCompatActivity
         /*Listener for swipes*/
         detector = new GestureDetector(this,new MyGestureDetector());
         if(orientation == Configuration.ORIENTATION_LANDSCAPE ||
-                getSupportFragmentManager().findFragmentById(R.id.player) != null) {
+                getSupportFragmentManager().findFragmentById(R.id.player) != null) {                /*Only set up when specific fragments are visible*/
             ImageView musicNoteImage = (ImageView) findViewById(R.id.image);
-            musicNoteImage.setOnTouchListener(new View.OnTouchListener() {
+            musicNoteImage.setOnTouchListener(new View.OnTouchListener() {                          /*Add the gesture listener to big disco ball image*/
                 @Override
                 public boolean onTouch(View view, MotionEvent motionEvent) {
                     detector.onTouchEvent(motionEvent);
@@ -321,34 +328,43 @@ public class MainActivity extends AppCompatActivity
             });
         }
 
+        /*Instantiate seekbar, because it may be used by other methods , or it will be used in this method*/
         if(seek == null){
             seek = mediaPlayer.getSeekBar();
         }
 
         /*Check if being recreated*/
         if(savedInstanceState != null){
+
+            /*Get values from bundle*/
             curSongIndex = savedInstanceState.getInt(CURRENT_SONG);
             int seekPos = savedInstanceState.getInt(CURRENT_SEEKBAR_POS);
             isPlaying = savedInstanceState.getBoolean(ISPLAYING);
             currentVolume = savedInstanceState.getFloat(VOLUME);
             boolean isPlayerNull = savedInstanceState.getBoolean(ISPLAYERNULL);
-            if(!isPlayerNull){
+
+            if(!isPlayerNull){                                      /*player object is null*/
                 player = MediaPlayer.create(MainActivity.this,
-                        Uri.parse(songPaths.get(curSongIndex)));
-                int seekRange = player.getDuration() / 1000;
-                player.setVolume(1-currentVolume,1-currentVolume);
-                seek.setMax(seekRange);
+                        Uri.parse(songPaths.get(curSongIndex)));    /*Create new player object*/
+
+                /*Set up what ui will display when song starts*/
+                int seekRange = player.getDuration() / 1000;        /*Duration of song*/
+                player.setVolume(1-currentVolume,1-currentVolume);  /*Set initial volume*/
+                seek.setMax(seekRange);                             /*Set max of seekbar*/
                 seek.setProgress(seekPos);
-                this.adjustSeekBarMovement();
-                player.seekTo(seekPos * 1000);
-                this.setDurationText();
-                if(isPlaying){
-                    /*Set text of animated textview and image of repeat button*/
+                this.adjustSeekBarMovement();                       /*Move the seekbar progress periodically as songs is playing*/
+                player.seekTo(seekPos * 1000);                      /*set player to correct time*/
+                this.setDurationText();                             /*Textviews for song duration and current time*/
+
+
+                if(isPlaying){                                      /*Player is active, it must start playing song*/
+                    /*Set text of animated textview and image of imagebuttons*/
                     TextView curSong;
                     SeekBar volumeBar;
                     ImageButton volButton;
                     ImageButton shuffleButton;
                     TextView albumView;
+                    /*Depending on screen orientation, retrieve textviews, imagebuttons and seekbars*/
                     if(orientation == Configuration.ORIENTATION_LANDSCAPE){
                         curSong = (TextView) findViewById(R.id.curSong);
                         volumeBar = (SeekBar) findViewById(R.id.volumeControl);
@@ -364,6 +380,7 @@ public class MainActivity extends AppCompatActivity
                         albumView = mediaPlayer.getAlbumView();
                     }
 
+                    /*Set correct images to imagebuttons*/
                     boolean loops = savedInstanceState.getBoolean(IS_LOOPING);
                     if(loops){
                         volButton.setImageResource(R.mipmap.repeat_active);
@@ -374,6 +391,7 @@ public class MainActivity extends AppCompatActivity
                         shuffleButton.setImageResource(R.mipmap.shuffle_active);
                     }
 
+                    /*Set progress and text*/
                     volumeBar.setProgress(savedInstanceState.getInt(VOLUMER_BAR_PROGRESS));
                     curSong.setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
 
@@ -385,6 +403,7 @@ public class MainActivity extends AppCompatActivity
                     ImageButton bt = (ImageButton) findViewById(R.id.Pause);
                     bt.setImageResource(R.mipmap.pause);
 
+                    /*Start playing song*/
                     if(this.requestFocus()) {
                         registerReceiver(noisyReceiver,intentFilter);
                         isRegistered = true;
@@ -394,6 +413,7 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
+
         /*Adjust text size and movement in song textview*/
         this.adjustText();
 
@@ -418,12 +438,13 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
+
     /*Adds listener to listview when in landscape orientation*/
     private void addListViewListener(){
         /*New create listview and add listener*/
         ListView list = (ListView) findViewById(R.id.playlist);
         adapter = new ArrayAdapter<>(MainActivity.this,R.layout.list_item,songNames);
-        list.setAdapter(adapter);
+        list.setAdapter(adapter);                                                           /*Populate list*/
 
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -436,16 +457,21 @@ public class MainActivity extends AppCompatActivity
                 /*Create new player with selected song*/
                 player = MediaPlayer.create(MainActivity.this,
                         Uri.parse(songPaths.get(position)));
+
                 /*Change current song index*/
                 curSongIndex = position;
                 MainActivity.this.setDurationText();
                 /*Start new song*/
                 player.setVolume(1-currentVolume,1-currentVolume);
+
+                /*start playing song*/
                 if(MainActivity.this.requestFocus()) {
                     registerReceiver(noisyReceiver,intentFilter);
                     isRegistered = true;
                     player.start();
                 }
+
+                /*set up text size and movement of seekbar and change icon of imagebutton for playing/pausing song*/
                 MainActivity.this.adjustText();
                 MainActivity.this.adjustSeekBarMovement();
                 ImageButton bt = (ImageButton) findViewById(R.id.Pause);
@@ -455,17 +481,19 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    /*Scans the sd card and saves all songs in a list of hashmaps*/
+    /*Scans the sd card and saves all songs in a list of Strings.
+     Use the cursor to make queries to the sql like structure.
+     */
     private void createPlaylist(){
-        String[] STAR = {"*"};
+        String[] STAR = {"*"};                                                  /*Select everything in table*/
         Cursor cursor;
-        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
-        String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;                  /*Get uri of path*/
+        String selection = MediaStore.Audio.Media.IS_MUSIC + "!=0";             /*Choose criterion*/
 
-        cursor = getContentResolver().query(uri,STAR,selection,null,null);
+        cursor = getContentResolver().query(uri,STAR,selection,null,null);      /*Instantiate cursor*/
 
         if(cursor != null){
-            if(cursor.moveToFirst()){
+            if(cursor.moveToFirst()){                                           /*Iterate over cursor*/
                 do {
                     String songName = cursor.getString(cursor
                             .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
@@ -480,19 +508,22 @@ public class MainActivity extends AppCompatActivity
                         songName = songName.substring(0,songName.length() - 4);
                     }
 
+                    /*Add item to list*/
                     songNames.add(songName);
                     songPaths.add(path);
                     albumNames.add(albumName);
+
                 }while(cursor.moveToNext());
             }
             cursor.close();
         }
+        /*save list size*/
         numSongs = songNames.size();
     }
 
     /*retrieves playlist from shared preferences so that it is not created again every time*/
     private void retrievePlaylist(){
-        SharedPreferences preferences = getSharedPreferences("SKATA",Context.MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences(getPackageName(),Context.MODE_PRIVATE);
         int size = preferences.getInt(LIST_SIZE,0);
         String listItem;
         String itemPath;
@@ -503,6 +534,7 @@ public class MainActivity extends AppCompatActivity
             listItem = preferences.getString(ITEM + i,null);
             itemPath = preferences.getString(PATH + i,null);
             albumName = preferences.getString(ALBUM + i,null);
+            /*Add to lists*/
             songNames.add(listItem);
             songPaths.add(itemPath);
             albumNames.add(albumName);
@@ -510,9 +542,11 @@ public class MainActivity extends AppCompatActivity
         numSongs = size;
     }
 
-    /*Method to save the playlist into sharedpreferences*/
+
+    /*Method to save the playlist into sharedpreferences when switching orientation*/
     private  void savePlaylist(){
-        SharedPreferences preferences = getSharedPreferences("SKATA",Context.MODE_PRIVATE);
+
+        SharedPreferences preferences = getSharedPreferences(getPackageName(),Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         int size = songNames.size();
 
@@ -521,21 +555,24 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
+        /*Save list size*/
         editor.putInt(LIST_SIZE,size);
 
+        /*save all list items*/
         for(int i = 0; i < size; i++){
             editor.putString(ITEM + i,songNames.get(i));
             editor.putString(PATH + i,songPaths.get(i));
             editor.putString(ALBUM + i,albumNames.get(i));
         }
 
+        /*Apply changes*/
         editor.apply();
     }
 
 
     /*This function is used to adjust the text size in the textviews
      *to match the screen size of a device better.
-     * It also begins animating the text to move from right to left
+     * It also begins animating the text in the textview with the song name to move from right to left
      */
     private void adjustText(){
 
@@ -548,7 +585,7 @@ public class MainActivity extends AppCompatActivity
         int width = dimensions.x;
         int height = dimensions.y;
 
-        /*Now get top textview and song textview*/
+        /*Now get top textview and song textview depending on the orientation*/
         TextView title;
         TextView currentSong;
         TextView currentSongTime;
@@ -577,7 +614,7 @@ public class MainActivity extends AppCompatActivity
         songDuration.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.03*height));
         albumNameView.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.04*height));
 
-        /*Find out text width in pixels for animation*/
+        /*Find out text width of the text on screen in pixels for animation*/
         Rect bounds = new Rect();
         Paint textPaint = currentSong.getPaint();
         textPaint.getTextBounds(currentSong.getText().toString(),
@@ -593,6 +630,8 @@ public class MainActivity extends AppCompatActivity
         else{
             animation = new TranslateAnimation(width,-textWidth,0,0);
         }
+
+        /*Set parameters of animation and start*/
         animation.setDuration(15000);
         animation.setRepeatMode(Animation.RESTART);
         animation.setRepeatCount(Animation.INFINITE);
@@ -603,6 +642,7 @@ public class MainActivity extends AppCompatActivity
     /*Method that is called when play button is clicked, to change its icon*/
     public void play(View view){
         ImageButton button = (ImageButton) findViewById(R.id.Pause);
+        /*If song is already playing pause it, change the button icon and unregister the receiver for audio changes*/
         if(isPlaying){
             button.setImageResource(R.mipmap.play);
             player.pause();
@@ -611,25 +651,33 @@ public class MainActivity extends AppCompatActivity
                 isRegistered = false;
             }
         }
-        else{
-            if(player == null){
+        else{   /*No song is playing*/
+            if(player == null){                                                                     /*A new player object needs to be created*/
+
+                /*Create player and set volume*/
                 String path = songPaths.get(curSongIndex);
                 player = MediaPlayer.create(MainActivity.this,Uri.parse(path));
                 player.setVolume(1-currentVolume,1-currentVolume);
-                /*Get duration for seekbar*/
+
+                /*Get duration for seekbar progress setting*/
                 int currentSongDuration = player.getDuration() / 1000;
                 seek.setMax(currentSongDuration);
+
+                /*Set texts in textviews*/
                 TextView songView = (TextView) findViewById(R.id.curSong);
                 songView.setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
                 TextView albumView = (TextView) findViewById(R.id.albumName);
-
                 String albumText = "Album: " + albumNames.get(curSongIndex);
                 albumView.setText(albumText,TextView.BufferType.NORMAL);
+
+                /*Adjust anything else which is necessary*/
                 this.adjustText();
                 this.adjustSeekBarMovement();
                 this.setDurationText();
             }
+            /*Change icon of button to pause icon*/
             button.setImageResource(R.mipmap.pause);
+            /*Start playing song*/
             if(this.requestFocus()) {
                 registerReceiver(noisyReceiver,intentFilter);
                 isRegistered = true;
@@ -640,110 +688,124 @@ public class MainActivity extends AppCompatActivity
         isPlaying = !isPlaying;
     }
 
-    /*Change pointer of seekbar once every second, as song is playing*/
+
+    /*Change pointer of song progress seekbar once every second, as song is playing and update texts
+    * of some textviews that show the current song time.*/
     private void adjustSeekBarMovement(){
 
         MainActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(songList == null) {
+                if(songList == null) {                           /*Case where mediaplayer Fragment is active*/
                     /*This is for the movement of the seekbar*/
-                    /*Time to go to next song*/
-                    if (seek.getProgress() == seek.getMax()) {
-                        if (!isRepeating) {
-                            ImageButton button = (ImageButton) findViewById(R.id.next);
-                            button.performClick();
-                        } else {
+                    if (seek.getProgress() == seek.getMax()) { /*Time to go to next song*/
+
+                        if (!isRepeating) {                    /*repeat function is not active*/
+                            MainActivity.this.nextSong(null);
+                        } else {                                /*Play same song again*/
+                            /*Set values*/
                             player.seekTo(0);
                             seek.setProgress(0);
+                            /*Start song again*/
                             if(MainActivity.this.requestFocus()) {
                                 registerReceiver(noisyReceiver,intentFilter);
                                 isRegistered = true;
                                 player.start();
                             }
                         }
+
                     } else if (player != null) {/*Update seeker position*/
+
                         int curPos = player.getCurrentPosition() / 1000;
                         seek.setProgress(curPos);
+
                     } else {/*No song is playing , dont let user change seeker*/
                         seek.setProgress(0);
                     }
 
+                    /*This is for changing the text of textviews next to seekbar*/
                     if (player != null) {
-                        /*This is for changing the text of textviews next to seekbar*/
+                        /*get current song timestamp in minutes and seconds*/
                         int curPos = player.getCurrentPosition() / 1000;
                         int minutes = curPos / 60;
                         int seconds = curPos % 60;
 
+                        /*Get songTime textview*/
                         TextView songTime;
                         if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
                             songTime = (TextView) findViewById(R.id.remaining_song_time);
                         } else {
                             songTime = mediaPlayer.getCurrentSongTimeView();
                         }
+
+                        /*Adjust string with an extra zero if necessary*/
                         String middle;
                         if (seconds < 10) {
                             middle = ":0";
                         } else {
                             middle = ":";
                         }
+
+                        /*Set text*/
                         String textToSet = minutes + middle + seconds;
                         songTime.setText(textToSet, TextView.BufferType.NORMAL);
                     }
                 }
-                else{
+                else{   /*Case where the list view fragment is visible*/
                     if(player != null) {
                         SeekBar songSeek = songList.getSeekBar();
-                        if(songSeek.getMax() == songSeek.getProgress()){
-                            if(!isRepeating) {
+                        if(songSeek.getMax() == songSeek.getProgress()){    /*Song finished*/
+                            if(!isRepeating) {                              /*Play next song*/
                                 MainActivity.this.simpleNext(null);
                             }
                             else{
-                                MainActivity.this.simplePlay(null);
+                                MainActivity.this.simplePlay(null);         /*Play same song again*/
                             }
                             songSeek.setProgress(0);
                         }
-                        else {
+                        else {                                              /*Update seeker position*/
                             int curPos = player.getCurrentPosition() / 1000;
                             songSeek.setProgress(curPos);
                         }
                     }
                 }
-                handler.postDelayed(this,1000);
+                handler.postDelayed(this,1000);                             /*Do this once every second*/
             }
         });
     }
 
-    /*Stop current song*/
+
+    /*Stop current song and release player*/
     public void stop(View view){
 
         /*If we have playback stop it*/
         if(player == null){
             return;
         }
+
+        /*release resources*/
         isPlaying = false;
         player.release();
-        player = null;/*Change play button icon*/
+        player = null;
+
+        /*Change play button icon*/
         ImageButton button  = (ImageButton) findViewById(R.id.Pause);
         button.setImageResource(R.mipmap.play);
+
         seek.setProgress(0);
         /*Empty textview that shows current song*/
         TextView currentSong = (TextView) findViewById(R.id.curSong);
         currentSong.setText("", TextView.BufferType.NORMAL);
 
         /*Set textview of current minute and second to 0:00*/
-        TextView curTime;
-        if(orientation == Configuration.ORIENTATION_LANDSCAPE){
-            curTime = (TextView) findViewById(R.id.remaining_song_time);
-        }
-        else{
-            curTime = mediaPlayer.getCurrentSongTimeView();
-        }
+        TextView curTime = (TextView) findViewById(R.id.remaining_song_time);
+
         String s = "0:00";
         curTime.setText(s, TextView.BufferType.NORMAL);
 
         am.abandonAudioFocus(afChangeListener);
     }
+
 
     /*Play next song in playlist*/
     public void nextSong(View view){
@@ -1070,7 +1132,7 @@ public class MainActivity extends AppCompatActivity
         }
         if(isFinishing()) {
             /*delete preferences*/
-            getSharedPreferences("SKATA",Context.MODE_PRIVATE).edit().clear().apply();
+            getSharedPreferences(getPackageName(),Context.MODE_PRIVATE).edit().clear().apply();
         }
         if(isRegistered) {
             unregisterReceiver(noisyReceiver);
