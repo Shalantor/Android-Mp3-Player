@@ -819,19 +819,21 @@ public class MainActivity extends AppCompatActivity
             curSongIndex = (curSongIndex + 1) % numSongs;
         }
 
+        /*Release previous player if exists one*/
         if(player != null) {
             player.release();
             player = null;
         }
-
         isPlaying=false;
-        ImageButton b = (ImageButton) findViewById(R.id.Pause);
-        b.performClick();
+
+        /*Play song*/
+        this.play(null);
     }
 
     /*Play previous song in playlist*/
     public void prevSong(View view){
 
+        /*Is shufle active?*/
         if(isShuffling){
             Random generator = new Random();
             curSongIndex = generator.nextInt(numSongs);
@@ -846,21 +848,17 @@ public class MainActivity extends AppCompatActivity
         }
 
         isPlaying = false;
-        ImageButton b = (ImageButton) findViewById(R.id.Pause);
-        b.performClick();
+
+        /*Play song*/
+        this.play(null);
 
      }
 
     /*button function to show the seekbar for volume control*/
     public void showVolumeControl(View view){
-        final SeekBar volumeSeekBar;
-        /*make seekbar visible*/
-        if(orientation == Configuration.ORIENTATION_LANDSCAPE){
-            volumeSeekBar = (SeekBar) findViewById(R.id.volumeControl);
-        }
-        else{
-            volumeSeekBar = mediaPlayer.getVolumeSeekBar();
-        }
+
+        /*get volume seekbar and set visible*/
+        final SeekBar volumeSeekBar = (SeekBar) findViewById(R.id.volumeControl);
         volumeSeekBar.setVisibility(View.VISIBLE);
 
         /*Set up a timer for the seekbar to disappear after a while*/
@@ -881,20 +879,22 @@ public class MainActivity extends AppCompatActivity
 
 
     /*Method to change the volume of song playing*/
-
     private void setupVolumeListener(){
 
         SeekBar volumeSeekBar;
-        /*Now change the volume seekbar progress*/
+        /*Get volume seekbar depending on orientation*/
         if(orientation == Configuration.ORIENTATION_LANDSCAPE){
             volumeSeekBar = (SeekBar) findViewById(R.id.volumeControl);
         }
         else{
             volumeSeekBar = mediaPlayer.getVolumeSeekBar();
         }
+
+        /*set max and progress*/
         volumeSeekBar.setMax(MAX_VOLUME);
         volumeSeekBar.setProgress(MAX_VOLUME / 2);
 
+        /*Add a listener to the volume seekbar*/
         volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int position, boolean b) {
@@ -903,6 +903,7 @@ public class MainActivity extends AppCompatActivity
                         timer.cancel();
                         MainActivity.this.showVolumeControl(null);
                     }
+                /*Calculate volume*/
                     currentVolume = (float)(Math.log(MAX_VOLUME - position)/Math.log(MAX_VOLUME));
                     if(player != null){
                         player.setVolume(1 - currentVolume,1 - currentVolume);
@@ -920,10 +921,9 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-
     }
 
-    /*Sets the textview text for the duration of the current song*/
+    /*Sets the textview text for the duration of the current song(next to song seekbar on right side)*/
     private void setDurationText(){
 
         /*Get correspoding textview*/
@@ -956,13 +956,11 @@ public class MainActivity extends AppCompatActivity
 
     /*Method to repeat song*/
     public void repeat(View view){
-        ImageButton bt ;
-        if(orientation == Configuration.ORIENTATION_LANDSCAPE ){
-            bt = (ImageButton) findViewById(R.id.loop_song);
-        }
-        else{
-            bt = mediaPlayer.getVolumeButton();
-        }
+
+        /*get button*/
+        ImageButton bt = (ImageButton) findViewById(R.id.loop_song);;
+
+        /*Check if is repeating or not*/
         if(isRepeating){
             bt.setImageResource(R.mipmap.repeat_not_active);
         }
@@ -971,6 +969,7 @@ public class MainActivity extends AppCompatActivity
         }
         isRepeating = !isRepeating;
     }
+
 
     /*method to show list view with songs*/
     public void showPlaylist(View view){
@@ -997,14 +996,18 @@ public class MainActivity extends AppCompatActivity
                 /*Set linearlayout visible*/
                 LinearLayout layout = songList.getButtonsBar();
                 layout.setVisibility(View.VISIBLE);
+
                 /*Set text of name view*/
                 TextView txt = songList.getNameTextView();
                 txt.setText(songNames.get(curSongIndex));
+
+                /*set progress of song seek bar*/
                 SeekBar songSeek = songList.getSeekBar();
                 songSeek.setMax(player.getDuration() / 1000);
                 songList.getVolumeSeekbar().setProgress(volumeProgress);
             }
 
+            /*nullify mediaplayer*/
             mediaPlayer = null;
             this.waitForSong();
         }
@@ -1020,8 +1023,11 @@ public class MainActivity extends AppCompatActivity
     /*Play song*/
     public void simplePlay(View view){
         ImageButton button = (ImageButton) findViewById(R.id.simple_play);
+
+        /*Check if playing or paused*/
         if(isPlaying){
             button.setImageResource(R.mipmap.play);
+            /*pause song*/
             player.pause();
             if(isRegistered) {
                 unregisterReceiver(noisyReceiver);
@@ -1030,6 +1036,7 @@ public class MainActivity extends AppCompatActivity
         }
         else{
             button.setImageResource(R.mipmap.pause);
+            /*Start song*/
             if(this.requestFocus()) {
                 registerReceiver(noisyReceiver,intentFilter);
                 isRegistered = true;
@@ -1057,6 +1064,7 @@ public class MainActivity extends AppCompatActivity
         }
         isPlaying = true;
 
+        /*Create new player object,set volume and start song*/
         player = MediaPlayer.create(MainActivity.this,Uri.parse(songPaths.get(curSongIndex)));
         player.setVolume(currentVolume,currentVolume);
         if(this.requestFocus()) {
@@ -1073,6 +1081,7 @@ public class MainActivity extends AppCompatActivity
     /*Play next song*/
     public void simpleNext(View view){
 
+        /*Check if shuffle is active*/
         if(isShuffling){
             Random generator = new Random();
             curSongIndex = generator.nextInt(numSongs);
@@ -1087,6 +1096,7 @@ public class MainActivity extends AppCompatActivity
         }
         isPlaying = true;
 
+        /*Create new player object, setVolume and play song*/
         player = MediaPlayer.create(MainActivity.this,Uri.parse(songPaths.get(curSongIndex)));
         player.setVolume(currentVolume,currentVolume);
         if(this.requestFocus()) {
@@ -1099,17 +1109,13 @@ public class MainActivity extends AppCompatActivity
         songList.getNameTextView().setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
     }
 
+
     /*Method for shuffle button*/
     public void shuffle(View view){
 
-        ImageButton bt ;
-        if(orientation == Configuration.ORIENTATION_LANDSCAPE ){
-            bt = (ImageButton) findViewById(R.id.shuffle);
-        }
-        else{
-            bt = mediaPlayer.getShuffleButton();
-        }
+        ImageButton bt = (ImageButton) findViewById(R.id.shuffle);
 
+        /*Check if shuffle is already active*/
         if (isShuffling){
             bt.setImageResource(R.mipmap.shuffle_not_active);
         }
@@ -1125,15 +1131,19 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onDestroy(){
         super.onDestroy();
-        /*Stop method tracing*/
+        /*Release recources*/
         if (player != null) {
             player.release();
             player = null;
         }
+
+        /*If the activity finishes for good, delete the sharedpreferences*/
         if(isFinishing()) {
             /*delete preferences*/
             getSharedPreferences(getPackageName(),Context.MODE_PRIVATE).edit().clear().apply();
         }
+
+        /*Unregister receiver if necessary*/
         if(isRegistered) {
             unregisterReceiver(noisyReceiver);
             isRegistered = false;
@@ -1143,6 +1153,7 @@ public class MainActivity extends AppCompatActivity
     /*Save data when destroyed*/
     @Override
     public void onSaveInstanceState(Bundle save){
+
         /*Save current state of media player*/
         save.putInt(CURRENT_SONG,curSongIndex);
         save.putBoolean(ISPLAYING,isPlaying);
@@ -1150,9 +1161,11 @@ public class MainActivity extends AppCompatActivity
         save.putFloat(VOLUME,currentVolume);
         save.putBoolean(IS_LOOPING,isRepeating);
         save.putBoolean(IS_SHUFFLING,isShuffling);
+
         /*Remove Fragment if screen is in portrait mode*/
         if(orientation == Configuration.ORIENTATION_PORTRAIT) {
             SeekBar volumeBar = (SeekBar) findViewById(R.id.volumeControl);
+
             if(volumeBar != null) {
                 save.putInt(VOLUMER_BAR_PROGRESS, volumeBar.getProgress());
             }
@@ -1165,6 +1178,7 @@ public class MainActivity extends AppCompatActivity
                     save.putInt(VOLUMER_BAR_PROGRESS,volumeBar.getProgress());
                 }
             }
+
             FragmentManager fm = getSupportFragmentManager();
             FragmentTransaction ft = fm.beginTransaction();
             /*Check which is the current active fragment*/
@@ -1227,6 +1241,8 @@ public class MainActivity extends AppCompatActivity
             return false;
         }
     }
+
+    /*Receiver to check if headset gets unplugged while this activity runs*/
 
     private class NoisyAudioStreamReceiver extends BroadcastReceiver{
         @Override
