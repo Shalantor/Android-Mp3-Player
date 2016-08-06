@@ -18,6 +18,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity
     private boolean isPlaying = false;                              /*is player playing something?*/
     private ArrayList<String> songNames = new ArrayList<>();
     private ArrayList<String> songPaths = new ArrayList<>();
+    private ArrayList<String> albumNames = new ArrayList<>();
     private int numSongs;
     private int curSongIndex;                                       /*Index of current song*/
     private android.os.Handler handler = new android.os.Handler();  /*Handler for extra thread on UI*/
@@ -77,6 +79,7 @@ public class MainActivity extends AppCompatActivity
     private static final String LIST_SIZE = "size";
     private static final String ITEM = "item";
     private static final String PATH = "path";
+    private static final String ALBUM = "album";
     private GestureDetector detector ;                              /*Detects swipes*/
     private AudioManager.OnAudioFocusChangeListener afChangeListener;/*Listener for audio focus*/
     private AudioManager am;
@@ -321,17 +324,20 @@ public class MainActivity extends AppCompatActivity
                     SeekBar volumeBar;
                     ImageButton volButton;
                     ImageButton shuffleButton;
+                    TextView albumView;
                     if(orientation == Configuration.ORIENTATION_LANDSCAPE){
                         curSong = (TextView) findViewById(R.id.curSong);
                         volumeBar = (SeekBar) findViewById(R.id.volumeControl);
                         volButton = (ImageButton) findViewById(R.id.loop_song);
                         shuffleButton = (ImageButton) findViewById(R.id.shuffle);
+                        albumView = (TextView) findViewById(R.id.albumName);
                     }
                     else{
                         curSong = mediaPlayer.getSongView();
                         volumeBar = mediaPlayer.getVolumeSeekBar();
                         volButton = mediaPlayer.getVolumeButton();
                         shuffleButton = mediaPlayer.getShuffleButton();
+                        albumView = mediaPlayer.getAlbumView();
                     }
 
                     boolean loops = savedInstanceState.getBoolean(IS_LOOPING);
@@ -343,8 +349,14 @@ public class MainActivity extends AppCompatActivity
                     if(shuffles){
                         shuffleButton.setImageResource(R.mipmap.shuffle_active);
                     }
+
                     volumeBar.setProgress(savedInstanceState.getInt(VOLUMER_BAR_PROGRESS));
                     curSong.setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
+
+                    /*Set text of albumName*/
+                    String albumText = "Album: " + albumNames.get(curSongIndex);
+                    albumView.setText(albumText, TextView.BufferType.NORMAL);
+
                     /*Change image of button to pause*/
                     ImageButton bt = (ImageButton) findViewById(R.id.Pause);
                     bt.setImageResource(R.mipmap.pause);
@@ -435,6 +447,8 @@ public class MainActivity extends AppCompatActivity
                             .getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME));
                     String path = cursor.getString(cursor
                             .getColumnIndex(MediaStore.Audio.Media.DATA));
+                    String albumName = cursor.getString(cursor
+                            .getColumnIndex(MediaStore.Audio.Media.ALBUM));
 
                     /*Remove file extension from songname*/
                     int dotPosition = songName.lastIndexOf('.');
@@ -444,6 +458,7 @@ public class MainActivity extends AppCompatActivity
 
                     songNames.add(songName);
                     songPaths.add(path);
+                    albumNames.add(albumName);
                 }while(cursor.moveToNext());
             }
             cursor.close();
@@ -453,24 +468,27 @@ public class MainActivity extends AppCompatActivity
 
     /*retrieves playlist from shared preferences so that it is not created again every time*/
     private void retrievePlaylist(){
-        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences("SKATA",Context.MODE_PRIVATE);
         int size = preferences.getInt(LIST_SIZE,0);
         String listItem;
         String itemPath;
+        String albumName;
 
         /*Loop through items of preferences*/
         for(int i = 0; i < size; i++){
             listItem = preferences.getString(ITEM + i,null);
             itemPath = preferences.getString(PATH + i,null);
+            albumName = preferences.getString(ALBUM + i,null);
             songNames.add(listItem);
             songPaths.add(itemPath);
+            albumNames.add(albumName);
         }
         numSongs = size;
     }
 
     /*Method to save the playlist into sharedpreferences*/
     private  void savePlaylist(){
-        SharedPreferences preferences = getPreferences(Context.MODE_PRIVATE);
+        SharedPreferences preferences = getSharedPreferences("SKATA",Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         int size = songNames.size();
 
@@ -484,6 +502,7 @@ public class MainActivity extends AppCompatActivity
         for(int i = 0; i < size; i++){
             editor.putString(ITEM + i,songNames.get(i));
             editor.putString(PATH + i,songPaths.get(i));
+            editor.putString(ALBUM + i,albumNames.get(i));
         }
 
         editor.apply();
@@ -510,17 +529,20 @@ public class MainActivity extends AppCompatActivity
         TextView currentSong;
         TextView currentSongTime;
         TextView songDuration;
+        TextView albumNameView;
         if(orientation == Configuration.ORIENTATION_LANDSCAPE) {
             title = (TextView) findViewById(R.id.title);
             currentSong = (TextView) findViewById(R.id.curSong);
             currentSongTime = (TextView) findViewById(R.id.remaining_song_time);
             songDuration = (TextView) findViewById(R.id.song_duration);
+            albumNameView = (TextView) findViewById(R.id.albumName);
         }
         else{
             currentSong = mediaPlayer.getSongView();
             title = mediaPlayer.getTitleView();
             currentSongTime = mediaPlayer.getCurrentSongTimeView();
             songDuration = mediaPlayer.getSongDurationView();
+            albumNameView = mediaPlayer.getAlbumView();
         }
 
         /*Set text font sizes of TextViews*/
@@ -529,8 +551,9 @@ public class MainActivity extends AppCompatActivity
         currentSong.setSelected(true);
         currentSongTime.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.03*height));
         songDuration.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.03*height));
+        albumNameView.setTextSize(TypedValue.COMPLEX_UNIT_PX,(int) (0.04*height));
 
-        /*Find out text width in pixels*/
+        /*Find out text width in pixels for animation*/
         Rect bounds = new Rect();
         Paint textPaint = currentSong.getPaint();
         textPaint.getTextBounds(currentSong.getText().toString(),
@@ -574,6 +597,10 @@ public class MainActivity extends AppCompatActivity
                 seek.setMax(currentSongDuration);
                 TextView songView = (TextView) findViewById(R.id.curSong);
                 songView.setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
+                TextView albumView = (TextView) findViewById(R.id.albumName);
+
+                String albumText = "Album: " + albumNames.get(curSongIndex);
+                albumView.setText(albumText,TextView.BufferType.NORMAL);
                 this.adjustText();
                 this.adjustSeekBarMovement();
                 this.setDurationText();
@@ -1019,7 +1046,7 @@ public class MainActivity extends AppCompatActivity
         }
         if(isFinishing()) {
             /*delete preferences*/
-            getPreferences(Context.MODE_PRIVATE).edit().clear().apply();
+            getSharedPreferences("SKATA",Context.MODE_PRIVATE).edit().clear().apply();
         }
         if(isRegistered) {
             unregisterReceiver(noisyReceiver);

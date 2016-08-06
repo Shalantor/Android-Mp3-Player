@@ -52,4 +52,8 @@ public class MediaPlayerFragment extends Fragment {
         return  (ImageButton) getActivity().findViewById(R.id.shuffle);
     }
 
+    public TextView getAlbumView(){
+        return (TextView) getActivity().findViewById(R.id.albumName);
+    }
+
 }
