@@ -18,7 +18,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.GestureDetector;
@@ -85,8 +84,9 @@ public class MainActivity extends AppCompatActivity
     private AudioManager am;
     private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
     private NoisyAudioStreamReceiver noisyReceiver = new NoisyAudioStreamReceiver();
-    private boolean isRegistered = false;
-    private boolean isShuffling = false;
+    private boolean isRegistered = false;                           /*Is audio receiver registered?*/
+    private boolean isShuffling = false;                            /*Is shuffle mode active?*/
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,51 +99,8 @@ public class MainActivity extends AppCompatActivity
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
         am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 
-        /*Setup audiofocus listener*/
-        afChangeListener = new AudioManager.OnAudioFocusChangeListener(){
-            public void onAudioFocusChange(int focusChange){
-                if(focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT){
-                    if(player != null && isPlaying) {
-                        if (orientation == Configuration.ORIENTATION_LANDSCAPE ||
-                                getSupportFragmentManager().findFragmentById(R.id.player) != null) {
-                            MainActivity.this.play(null);
-                        }
-                        else{
-                            MainActivity.this.simplePlay(null);
-                        }
-                    }
-                }
-                else if(focusChange == AudioManager.AUDIOFOCUS_GAIN){
-                    if(player != null && !isPlaying) {
-                        if (orientation == Configuration.ORIENTATION_LANDSCAPE ||
-                                getSupportFragmentManager().findFragmentById(R.id.player) != null) {
-                            MainActivity.this.play(null);
-                        }
-                        else{
-                            MainActivity.this.simplePlay(null);
-                        }
-                    }
-                }
-                else if(focusChange == AudioManager.AUDIOFOCUS_LOSS){
-                    am.abandonAudioFocus(afChangeListener);
-                    if (orientation == Configuration.ORIENTATION_LANDSCAPE ||
-                            getSupportFragmentManager().findFragmentById(R.id.player) != null) {
-                        MainActivity.this.stop(null);
-                        if(isRegistered) {
-                            unregisterReceiver(noisyReceiver);
-                            isRegistered = false;
-                        }
-                    }
-                    else{
-                        if(player != null){
-                            player.release();
-                            player = null;
-                        }
-                    }
-                }
-            }
-        };
-
+        /*Ad listener for audio focus change*/
+        this.addAudioListener();
 
         /*Create the playlist */
         if(savedInstanceState == null) {
@@ -170,37 +127,48 @@ public class MainActivity extends AppCompatActivity
             /*Media player is being recreated*/
             if(savedInstanceState != null) {
                 boolean isNull = savedInstanceState.getBoolean(ISPLAYERNULL);
-                if(isNull){
+                if(isNull){                                                     /*player was not playing any song before recreation*/
                     songList = new ListViewFragment();
                     getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,songList).commit();
                 }
-                else {
+                else {                                                          /*player was playing a song before recreation*/
                     mediaPlayer = new MediaPlayerFragment();
                     getSupportFragmentManager().beginTransaction().add(R.id.fragment_container, mediaPlayer).commit();
                     save = savedInstanceState; /*Will be used in onStart to setupPlayer*/
                 }
             }
-            else{/*Create listView for user to choose a song,since no song is playing*/
+            else{/*Create listView for user to choose a song,since player was created for first time*/
                 songList = new ListViewFragment();
                 getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,songList).commit();
             }
         }
     }
 
+    /*Some methods like finding a view by id cannot be called in
+    the onCreate function because we deal with fragments. So they have
+    to be executed after the gui has been created. In this case this only
+    happens in portrait mode , because only then some fragments will be
+    added dynamically to the activity.
+     */
+
     @Override
     protected void onStart(){
         super.onStart();
+
         if(orientation == Configuration.ORIENTATION_PORTRAIT){
-            if(save != null) {/*Show list of songs*/
+
+            if(save != null) { /*Being recreated or not?*/
                 boolean isNull = save.getBoolean(ISPLAYERNULL);
-                if(isNull){
+
+                if(isNull){/*Show list of songs*/
                     this.waitForSong();
                 }
                 else {
-                    seek = mediaPlayer.getSeekBar();
+                    seek = mediaPlayer.getSeekBar(); /*seekbar for song */
                     this.setupVolumeListener();
                     this.setupPlayer(save);
                 }
+                /*Instantiate seekbar for volume*/
                 SeekBar volumeBar = mediaPlayer.getVolumeSeekBar();
                 volumeBar.setProgress(save.getInt(VOLUMER_BAR_PROGRESS));
             }
@@ -208,9 +176,65 @@ public class MainActivity extends AppCompatActivity
                 this.waitForSong();
             }
         }
+
     }
 
-    /*Method to request audio focus*/
+    /*Method to add listener for audio focus*/
+    private void addAudioListener(){
+                /*Setup audio focus listener*/
+        afChangeListener = new AudioManager.OnAudioFocusChangeListener(){
+            public void onAudioFocusChange(int focusChange){
+                if(focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT){                          /*Temporary loss of audio focus, pause player*/
+                    if(player != null && isPlaying) {
+                        /*Check which fragments are visible*/
+                        if (orientation == Configuration.ORIENTATION_LANDSCAPE ||
+                                getSupportFragmentManager().findFragmentById(R.id.player) != null) {
+                            MainActivity.this.play(null);
+                        }
+                        else{
+                            MainActivity.this.simplePlay(null);
+                        }
+                    }
+                }
+                else if(focusChange == AudioManager.AUDIOFOCUS_GAIN){                               /*Got audio focus, play song*/
+                    if(player != null && !isPlaying) {
+                        /*Check which fragments are visible*/
+                        if (orientation == Configuration.ORIENTATION_LANDSCAPE ||
+                                getSupportFragmentManager().findFragmentById(R.id.player) != null) {
+                            MainActivity.this.play(null);
+                        }
+                        else{
+                            MainActivity.this.simplePlay(null);
+                        }
+                    }
+                }
+                else if(focusChange == AudioManager.AUDIOFOCUS_LOSS){                               /*lost audiofocus for good, stop player release resources*/
+                    am.abandonAudioFocus(afChangeListener);
+                    /*Check which fragments are visible*/
+                    if (orientation == Configuration.ORIENTATION_LANDSCAPE ||
+                            getSupportFragmentManager().findFragmentById(R.id.player) != null) {
+                        MainActivity.this.stop(null);
+                        if(isRegistered) {
+                            unregisterReceiver(noisyReceiver);          /*Unregister receiver*/
+                            isRegistered = false;
+                        }
+                    }
+                    else{
+                        if(player != null){                             /*release player resource*/
+                            player.release();
+                            player = null;
+                            if(isRegistered) {
+                                unregisterReceiver(noisyReceiver);          /*Unregister receiver*/
+                                isRegistered = false;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+    }
+
+    /*Method to request audio focus before starting playback*/
     private boolean requestFocus(){
         int result = am.requestAudioFocus(afChangeListener,AudioManager.STREAM_MUSIC,AudioManager.AUDIOFOCUS_GAIN);
 
