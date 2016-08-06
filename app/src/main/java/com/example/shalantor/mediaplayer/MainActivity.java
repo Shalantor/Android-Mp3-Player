@@ -34,6 +34,7 @@ import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -81,6 +82,7 @@ public class MainActivity extends AppCompatActivity
     private IntentFilter intentFilter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
     private NoisyAudioStreamReceiver noisyReceiver = new NoisyAudioStreamReceiver();
     private boolean isRegistered = false;
+    private boolean isShuffling = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -677,7 +679,14 @@ public class MainActivity extends AppCompatActivity
     /*Play next song in playlist*/
     public void nextSong(View view){
 
-        curSongIndex = (curSongIndex + 1) % numSongs;
+        /*Check if shuffle is active*/
+        if(isShuffling){
+            Random generator = new Random();
+            curSongIndex = generator.nextInt(numSongs);
+        }
+        else{
+            curSongIndex = (curSongIndex + 1) % numSongs;
+        }
 
         if(player != null) {
             player.release();
@@ -691,7 +700,14 @@ public class MainActivity extends AppCompatActivity
 
     /*Play previous song in playlist*/
     public void prevSong(View view){
-        curSongIndex = ((curSongIndex - 1) + numSongs) % numSongs;
+
+        if(isShuffling){
+            Random generator = new Random();
+            curSongIndex = generator.nextInt(numSongs);
+        }
+        else {
+            curSongIndex = ((curSongIndex - 1) + numSongs) % numSongs;
+        }
 
         if(player!=null) {
             player.release();
@@ -894,7 +910,15 @@ public class MainActivity extends AppCompatActivity
 
     /*Play previous song*/
     public void simplePrevious(View view){
-        curSongIndex = ((curSongIndex - 1) + numSongs) % numSongs;
+
+        /*Check if shuffle active*/
+        if(isShuffling){
+            Random generator = new Random();
+            curSongIndex = generator.nextInt(numSongs);
+        }
+        else{
+            curSongIndex = ((curSongIndex - 1) + numSongs) % numSongs;
+        }
 
         if(player!=null) {
             player.release();
@@ -917,7 +941,14 @@ public class MainActivity extends AppCompatActivity
 
     /*Play next song*/
     public void simpleNext(View view){
-        curSongIndex = ((curSongIndex - 1) + numSongs) % numSongs;
+
+        if(isShuffling){
+            Random generator = new Random();
+            curSongIndex = generator.nextInt(numSongs);
+        }
+        else{
+            curSongIndex = ((curSongIndex - 1) + numSongs) % numSongs;
+        }
 
         if(player!=null) {
             player.release();
@@ -933,8 +964,30 @@ public class MainActivity extends AppCompatActivity
             player.start();
         }
 
-        /*Update teext of textview*/
+        /*Update text of textview*/
         songList.getNameTextView().setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
+    }
+
+    /*Method for shuffle button*/
+    public void shuffle(View view){
+
+        ImageButton bt ;
+        if(orientation == Configuration.ORIENTATION_LANDSCAPE ){
+            bt = (ImageButton) findViewById(R.id.shuffle);
+        }
+        else{
+            bt = mediaPlayer.getShuffleButton();
+        }
+
+        if (isShuffling){
+            bt.setImageResource(R.mipmap.shuffle_not_active);
+        }
+        else{
+            bt.setImageResource(R.mipmap.shuffle_active);
+        }
+
+        isShuffling = !isShuffling;
+
     }
 
     /*OnDestroy function Override*/

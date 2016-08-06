@@ -48,4 +48,8 @@ public class MediaPlayerFragment extends Fragment {
         return (ImageButton) getActivity().findViewById(R.id.loop_song);
     }
 
+    public ImageButton getShuffleButton(){
+        return  (ImageButton) getActivity().findViewById(R.id.shuffle);
+    }
+
 }
