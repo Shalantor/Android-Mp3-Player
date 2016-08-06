@@ -62,6 +62,16 @@
             <ImageButton
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
+                android:id="@+id/shuffle"
+                android:contentDescription="@string/shuffle"
+                android:src="@mipmap/shuffle_not_active"
+                android:scaleType="fitXY"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_weight="0.3" />
+
+            <ImageButton
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
                 android:id="@+id/loop_song"
                 android:contentDescription="@string/loop"
                 android:src="@mipmap/repeat_not_active"
