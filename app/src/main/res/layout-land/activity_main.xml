@@ -20,7 +20,7 @@
         android:id="@+id/player"
         android:layout_gravity="center_vertical"
         tools:layout="@layout/media_player_fragment"
-        android:layout_weight="1"/>
+        android:layout_weight="0.7"/>
 
     <fragment
         android:layout_width="match_parent"
