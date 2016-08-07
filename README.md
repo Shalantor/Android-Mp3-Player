@@ -1,3 +1,3 @@
-# Android-Media-Player
+Android mp3 player
 
-A simple media player for Android
+A simple Android mp3 player, supporting screen orientation switching and implementing dynamic fragments for its user interface.
