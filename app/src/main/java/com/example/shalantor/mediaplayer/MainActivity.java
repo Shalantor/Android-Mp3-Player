@@ -462,7 +462,7 @@ public class MainActivity extends AppCompatActivity
                 curSongIndex = position;
                 MainActivity.this.setDurationText();
 
-                /*Update moving text with current song name*/
+                /*Change moving text*/
                 TextView movingText = (TextView) findViewById(R.id.curSong);
                 movingText.setText(songNames.get(position), TextView.BufferType.NORMAL);
 
