@@ -4,6 +4,8 @@
     android:layout_height="wrap_content"
     android:gravity="start"
     android:textSize="50sp"
-    android:layout_gravity="start">
+    android:layout_gravity="start"
+    android:ellipsize="end"
+    android:maxLines="1">
 
 </TextView>
