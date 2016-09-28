@@ -1,3 +1,3 @@
-# Android-Media-Player
+# Android-Mp3-Player
 
-A simple media player for Android
+A mp3 player for Android.

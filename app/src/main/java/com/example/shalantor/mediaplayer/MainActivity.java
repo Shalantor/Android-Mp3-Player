@@ -461,6 +461,11 @@ public class MainActivity extends AppCompatActivity
                 /*Change current song index*/
                 curSongIndex = position;
                 MainActivity.this.setDurationText();
+
+                /*Update moving text with current song name*/
+                TextView movingText = (TextView) findViewById(R.id.curSong);
+                movingText.setText(songNames.get(position), TextView.BufferType.NORMAL);
+
                 /*Start new song*/
                 player.setVolume(1-currentVolume,1-currentVolume);
 
@@ -958,7 +963,7 @@ public class MainActivity extends AppCompatActivity
     public void repeat(View view){
 
         /*get button*/
-        ImageButton bt = (ImageButton) findViewById(R.id.loop_song);;
+        ImageButton bt = (ImageButton) findViewById(R.id.loop_song);
 
         /*Check if is repeating or not*/
         if(isRepeating){
