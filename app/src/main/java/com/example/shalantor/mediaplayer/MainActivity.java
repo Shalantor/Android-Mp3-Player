@@ -1,10 +1,12 @@
 package com.example.shalantor.mediaplayer;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.graphics.Paint;
@@ -13,7 +15,9 @@ import android.graphics.Rect;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +45,7 @@ import java.util.TimerTask;
 public class MainActivity extends AppCompatActivity
         implements ListViewFragment.OnSongSelectedListener{
 
+    private ListView list;
     private MediaPlayer player;
     private boolean isPlaying = false;                              /*is player playing something?*/
     private ArrayList<String> songNames = new ArrayList<>();
@@ -54,10 +59,10 @@ public class MainActivity extends AppCompatActivity
     /*Various strings used as bundle tags*/
     static final String CURRENT_SONG = "curSong";
     static final String CURRENT_SEEKBAR_POS = "seekPos";
-    static final String ISPLAYING = "isPlaying";
-    static final String ISPLAYERNULL = "isPaused";
+    static final String IS_PLAYING = "isPlaying";
+    static final String IS_PLAYERNULL = "isPaused";
     static final String VOLUME = "volume";
-    static final String VOLUMER_BAR_PROGRESS = "volumeBar";
+    static final String VOLUME_BAR_PROGRESS = "volumeBar";
     static final String IS_LOOPING = "isLooping";
     static final String IS_SHUFFLING = "isShuffling";
     private int orientation;                                        /*Orientation of screen*/
@@ -70,10 +75,12 @@ public class MainActivity extends AppCompatActivity
                                     /Math.log(MAX_VOLUME));         /*Starting volume*/
     private Timer timer;                                            /*Timer for volume seekbar*/
     private boolean isRepeating = false;                            /*Is song on repeat mode?*/
+
     /*Constants for swiping*/
     private static final int SWIPE_MIN_DISTANCE = 120;
     private static final int SWIPE_MAX_OFF_PATH = 250;
     private static final int SWIPE_THRESHOLD_VELOCITY = 200;
+
     /*Constants for recreating play list */
     private static final String LIST_SIZE = "size";
     private static final String ITEM = "item";
@@ -104,7 +111,16 @@ public class MainActivity extends AppCompatActivity
 
         /*Create the playlist */
         if(savedInstanceState == null) {
-            this.createPlaylist();
+            if (Build.VERSION.SDK_INT < 23){
+                this.createPlaylist();
+            }
+            else if(checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED){
+                this.createPlaylist();
+            }
+            else{
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+            }
         }
         else{/*If recreated retrieve playlist from SharedPreferences*/
             this.retrievePlaylist();
@@ -126,7 +142,7 @@ public class MainActivity extends AppCompatActivity
             setContentView(R.layout.fragment_container_portrait);
             /*Media player is being recreated*/
             if(savedInstanceState != null) {
-                boolean isNull = savedInstanceState.getBoolean(ISPLAYERNULL);
+                boolean isNull = savedInstanceState.getBoolean(IS_PLAYERNULL);
                 if(isNull){                                                     /*player was not playing any song before recreation*/
                     songList = new ListViewFragment();
                     getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,songList).commit();
@@ -155,25 +171,26 @@ public class MainActivity extends AppCompatActivity
     protected void onStart(){
         super.onStart();
 
-        if(orientation == Configuration.ORIENTATION_PORTRAIT){
+        if (Build.VERSION.SDK_INT < 23 || ( Build.VERSION.SDK_INT >=23 && checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED)) {
+            if (orientation == Configuration.ORIENTATION_PORTRAIT) {
 
-            if(save != null) { /*Being recreated or not?*/
-                boolean isNull = save.getBoolean(ISPLAYERNULL);
+                if (save != null) { /*Being recreated or not?*/
+                    boolean isNull = save.getBoolean(IS_PLAYERNULL);
 
-                if(isNull){/*Show list of songs*/
+                    if (isNull) {/*Show list of songs*/
+                        this.waitForSong();
+                    } else {
+                        seek = mediaPlayer.getSeekBar(); /*seekbar for song */
+                        this.setupVolumeListener();
+                        this.setupPlayer(save);
+                    }
+                    /*Instantiate seekbar for volume*/
+                    SeekBar volumeBar = mediaPlayer.getVolumeSeekBar();
+                    volumeBar.setProgress(save.getInt(VOLUME_BAR_PROGRESS));
+                } else {/*Show list of songs*/
                     this.waitForSong();
                 }
-                else {
-                    seek = mediaPlayer.getSeekBar(); /*seekbar for song */
-                    this.setupVolumeListener();
-                    this.setupPlayer(save);
-                }
-                /*Instantiate seekbar for volume*/
-                SeekBar volumeBar = mediaPlayer.getVolumeSeekBar();
-                volumeBar.setProgress(save.getInt(VOLUMER_BAR_PROGRESS));
-            }
-            else{/*Show list of songs*/
-                this.waitForSong();
             }
         }
 
@@ -339,9 +356,9 @@ public class MainActivity extends AppCompatActivity
             /*Get values from bundle*/
             curSongIndex = savedInstanceState.getInt(CURRENT_SONG);
             int seekPos = savedInstanceState.getInt(CURRENT_SEEKBAR_POS);
-            isPlaying = savedInstanceState.getBoolean(ISPLAYING);
+            isPlaying = savedInstanceState.getBoolean(IS_PLAYING);
             currentVolume = savedInstanceState.getFloat(VOLUME);
-            boolean isPlayerNull = savedInstanceState.getBoolean(ISPLAYERNULL);
+            boolean isPlayerNull = savedInstanceState.getBoolean(IS_PLAYERNULL);
 
             if(!isPlayerNull){                                      /*player object is null*/
                 player = MediaPlayer.create(MainActivity.this,
@@ -392,7 +409,7 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     /*Set progress and text*/
-                    volumeBar.setProgress(savedInstanceState.getInt(VOLUMER_BAR_PROGRESS));
+                    volumeBar.setProgress(savedInstanceState.getInt(VOLUME_BAR_PROGRESS));
                     curSong.setText(songNames.get(curSongIndex), TextView.BufferType.NORMAL);
 
                     /*Set text of albumName*/
@@ -442,7 +459,7 @@ public class MainActivity extends AppCompatActivity
     /*Adds listener to listview when in landscape orientation*/
     private void addListViewListener(){
         /*New create listview and add listener*/
-        ListView list = (ListView) findViewById(R.id.playlist);
+        list = (ListView) findViewById(R.id.playlist);
         adapter = new ArrayAdapter<>(MainActivity.this,R.layout.list_item,songNames);
         list.setAdapter(adapter);                                                           /*Populate list*/
 
@@ -490,6 +507,7 @@ public class MainActivity extends AppCompatActivity
      Use the cursor to make queries to the sql like structure.
      */
     private void createPlaylist(){
+
         String[] STAR = {"*"};                                                  /*Select everything in table*/
         Cursor cursor;
         Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;                  /*Get uri of path*/
@@ -579,6 +597,7 @@ public class MainActivity extends AppCompatActivity
      *to match the screen size of a device better.
      * It also begins animating the text in the textview with the song name to move from right to left
      */
+    /*TODO:SET HARDCODED VALUES IN XML FILES*/
     private void adjustText(){
 
         /*Check size of screen to set textview font size*/
@@ -1161,8 +1180,8 @@ public class MainActivity extends AppCompatActivity
 
         /*Save current state of media player*/
         save.putInt(CURRENT_SONG,curSongIndex);
-        save.putBoolean(ISPLAYING,isPlaying);
-        save.putBoolean(ISPLAYERNULL,player == null);
+        save.putBoolean(IS_PLAYING,isPlaying);
+        save.putBoolean(IS_PLAYERNULL,player == null);
         save.putFloat(VOLUME,currentVolume);
         save.putBoolean(IS_LOOPING,isRepeating);
         save.putBoolean(IS_SHUFFLING,isShuffling);
@@ -1172,15 +1191,15 @@ public class MainActivity extends AppCompatActivity
             SeekBar volumeBar = (SeekBar) findViewById(R.id.volumeControl);
 
             if(volumeBar != null) {
-                save.putInt(VOLUMER_BAR_PROGRESS, volumeBar.getProgress());
+                save.putInt(VOLUME_BAR_PROGRESS, volumeBar.getProgress());
             }
             else{
                 if(player == null) {
-                    save.putInt(VOLUMER_BAR_PROGRESS, MAX_VOLUME / 2);
+                    save.putInt(VOLUME_BAR_PROGRESS, MAX_VOLUME / 2);
                 }
                 else{/*Extended list fragment case*/
                     volumeBar = songList.getVolumeSeekbar();
-                    save.putInt(VOLUMER_BAR_PROGRESS,volumeBar.getProgress());
+                    save.putInt(VOLUME_BAR_PROGRESS,volumeBar.getProgress());
                 }
             }
 
@@ -1205,7 +1224,7 @@ public class MainActivity extends AppCompatActivity
         else{
             save.putInt(CURRENT_SEEKBAR_POS, seek.getProgress());
             SeekBar volumeBar = (SeekBar) findViewById(R.id.volumeControl);
-            save.putInt(VOLUMER_BAR_PROGRESS,volumeBar.getProgress());
+            save.putInt(VOLUME_BAR_PROGRESS,volumeBar.getProgress());
         }
 
         /*Save playlist*/
@@ -1263,6 +1282,14 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
+            this.createPlaylist();
         }
     }
 
