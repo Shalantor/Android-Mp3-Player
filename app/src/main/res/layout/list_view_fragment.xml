@@ -39,7 +39,8 @@
         android:layout_weight="0.05"
         android:id="@+id/button_bar"
         android:visibility="gone"
-        android:background="@color/black">
+        android:background="@color/black"
+        android:paddingBottom="@dimen/list_items_padding">
 
         <SeekBar
             android:layout_width="match_parent"
@@ -50,15 +51,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:paddingBottom="@dimen/list_view_padding">
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
+                android:layout_height="wrap_content"
                 android:id="@+id/list_show_song"
                 android:textSize="@dimen/text_size"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                android:layout_weight="2"/>
 
             <ImageButton
                 android:layout_width="@dimen/button_dimension"
@@ -66,7 +68,6 @@
                 android:background="@mipmap/previous"
                 android:scaleType="fitXY"
                 android:contentDescription="@string/previous"
-                android:layout_weight="0.15"
                 android:id="@+id/simple_previous"
                 android:onClick="simplePrevious" />
 
@@ -76,7 +77,6 @@
                 android:background="@mipmap/pause"
                 android:scaleType="fitXY"
                 android:contentDescription="@string/play"
-                android:layout_weight="0.15"
                 android:id="@+id/simple_play"
                 android:onClick="simplePlay"/>
 
@@ -86,7 +86,6 @@
                 android:background="@mipmap/next"
                 android:scaleType="fitXY"
                 android:contentDescription="@string/next"
-                android:layout_weight="0.15"
                 android:id="@+id/simple_next"
                 android:onClick="simpleNext"/>
 

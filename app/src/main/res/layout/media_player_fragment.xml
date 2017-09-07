@@ -16,7 +16,8 @@
             android:text="@string/gkplayer"
             android:gravity="center"
             android:id="@+id/title"
-            android:textColor="@color/white"/>
+            android:textColor="@color/white"
+            android:textSize="@dimen/text_size"/>
 
         <FrameLayout
             android:layout_width="match_parent"
@@ -37,10 +38,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal|bottom"
-                android:paddingStart="150sp"
-                android:paddingLeft="150sp"
-                android:paddingEnd="150sp"
-                android:paddingRight="150sp"
+                android:paddingStart="@dimen/seek_bar_padding"
+                android:paddingLeft="@dimen/seek_bar_padding"
+                android:paddingEnd="@dimen/seek_bar_padding"
+                android:paddingRight="@dimen/seek_bar_padding"
                 android:visibility="invisible"
                 android:id="@+id/volumeControl"/>
 
@@ -55,7 +56,8 @@
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size"
                 android:id="@+id/albumName"
                 android:layout_weight="1"
                 android:textColor="@color/white"
@@ -63,7 +65,7 @@
 
             <ImageButton
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="@dimen/button_dimension"
                 android:id="@+id/shuffle"
                 android:contentDescription="@string/shuffle"
                 android:src="@mipmap/shuffle_not_active"
@@ -74,7 +76,7 @@
 
             <ImageButton
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="@dimen/button_dimension"
                 android:id="@+id/loop_song"
                 android:contentDescription="@string/loop"
                 android:src="@mipmap/repeat_not_active"
@@ -85,7 +87,7 @@
 
             <ImageButton
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"
+                android:layout_height="@dimen/button_dimension"
                 android:id="@+id/show_playlist"
                 android:contentDescription="@string/show_list"
                 android:src="@mipmap/list"
@@ -104,6 +106,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textSize="@dimen/text_size"
                 android:id="@+id/curSong"
                 android:focusable="true"
                 android:focusableInTouchMode="true"
@@ -126,7 +129,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/remaining_song_time"
                 android:text="@string/empty_spaces"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size"/>
 
             <SeekBar
                 android:layout_width="0dp"
@@ -139,7 +143,8 @@
                 android:layout_height="wrap_content"
                 android:id="@+id/song_duration"
                 android:text="@string/empty_spaces"
-                android:textColor="@color/white"/>
+                android:textColor="@color/white"
+                android:textSize="@dimen/text_size"/>
 
         </LinearLayout>
 
@@ -155,8 +160,8 @@
 
             <ImageButton
                 android:contentDescription="@string/record"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_width="@dimen/button_dimension"
+                android:layout_height="@dimen/button_dimension"
                 style="?android:attr/buttonBarButtonStyle"
                 android:id="@+id/volume"
                 android:src="@mipmap/speaker"
