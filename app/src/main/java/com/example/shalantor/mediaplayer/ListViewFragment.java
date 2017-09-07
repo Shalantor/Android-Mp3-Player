@@ -24,7 +24,7 @@ public class ListViewFragment extends Fragment {
     }
 
     public ListView getListView(){
-        return (ListView) getView().findViewById(R.id.playlist);
+        return (ListView) getActivity().findViewById(R.id.playlist);
     }
 
     public interface OnSongSelectedListener{
