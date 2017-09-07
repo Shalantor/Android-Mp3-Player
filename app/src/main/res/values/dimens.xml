@@ -7,4 +7,6 @@
     <dimen name="list_view_padding">10dp</dimen>
     <dimen name="button_dimension">50dp</dimen>
     <dimen name="list_items_padding">10dp</dimen>
+    <dimen name="image_size">200dp</dimen>
+    <dimen name="menu_button_dimensions">70dp</dimen>
 </resources>

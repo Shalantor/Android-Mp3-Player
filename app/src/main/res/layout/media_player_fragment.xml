@@ -21,13 +21,12 @@
 
         <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:orientation="vertical"
-            android:layout_weight="1">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <ImageView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="@dimen/image_size"
                 android:id="@+id/image"
                 android:background="@drawable/discoball"
                 android:adjustViewBounds="true"
@@ -51,21 +50,20 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="end"
-            android:layout_weight="0.05">
+            android:gravity="end">
 
             <TextView
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:textSize="@dimen/text_size"
                 android:id="@+id/albumName"
-                android:layout_weight="1"
+                android:layout_weight="2"
                 android:textColor="@color/white"
                 android:gravity="start|center"/>
 
             <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_dimension"
+                android:layout_width="@dimen/menu_button_dimensions"
+                android:layout_height="@dimen/menu_button_dimensions"
                 android:id="@+id/shuffle"
                 android:contentDescription="@string/shuffle"
                 android:src="@mipmap/shuffle_not_active"
@@ -75,8 +73,8 @@
                 android:onClick="shuffle"/>
 
             <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_dimension"
+                android:layout_width="@dimen/menu_button_dimensions"
+                android:layout_height="@dimen/menu_button_dimensions"
                 android:id="@+id/loop_song"
                 android:contentDescription="@string/loop"
                 android:src="@mipmap/repeat_not_active"
@@ -86,8 +84,8 @@
                 android:onClick="repeat"/>
 
             <ImageButton
-                android:layout_width="wrap_content"
-                android:layout_height="@dimen/button_dimension"
+                android:layout_width="@dimen/menu_button_dimensions"
+                android:layout_height="@dimen/menu_button_dimensions"
                 android:id="@+id/show_playlist"
                 android:contentDescription="@string/show_list"
                 android:src="@mipmap/list"
@@ -155,66 +153,60 @@
             android:layout_height="wrap_content"
             android:id="@+id/buttons"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_weight="0.05">
+            android:gravity="center">
 
             <ImageButton
                 android:contentDescription="@string/record"
-                android:layout_width="@dimen/button_dimension"
-                android:layout_height="@dimen/button_dimension"
+                android:layout_width="@dimen/menu_button_dimensions"
+                android:layout_height="@dimen/menu_button_dimensions"
                 style="?android:attr/buttonBarButtonStyle"
                 android:id="@+id/volume"
                 android:src="@mipmap/speaker"
                 android:scaleType="fitXY"
-                android:layout_weight="1"
                 android:onClick="showVolumeControl"
                 />
 
             <ImageButton
                 android:contentDescription="@string/previous"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_width="@dimen/menu_button_dimensions"
+                android:layout_height="@dimen/menu_button_dimensions"
                 style="?android:attr/buttonBarButtonStyle"
                 android:id="@+id/previous"
                 android:src="@mipmap/previous"
                 android:scaleType="fitXY"
-                android:layout_weight="1"
                 android:onClick="prevSong"
                 />
 
             <ImageButton
                 android:contentDescription="@string/play"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_width="@dimen/menu_button_dimensions"
+                android:layout_height="@dimen/menu_button_dimensions"
                 style="?android:attr/buttonBarButtonStyle"
                 android:id="@+id/Pause"
                 android:src="@mipmap/play"
                 android:scaleType="fitXY"
-                android:layout_weight="1"
                 android:onClick="play"
                 />
 
             <ImageButton
                 android:contentDescription="@string/stop"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_width="@dimen/menu_button_dimensions"
+                android:layout_height="@dimen/menu_button_dimensions"
                 style="?android:attr/buttonBarButtonStyle"
                 android:id="@+id/Stop"
                 android:src="@mipmap/stop"
                 android:scaleType="fitXY"
-                android:layout_weight="1"
                 android:onClick="stop"
                 />
 
             <ImageButton
                 android:contentDescription="@string/next"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:layout_width="@dimen/menu_button_dimensions"
+                android:layout_height="@dimen/menu_button_dimensions"
                 style="?android:attr/buttonBarButtonStyle"
                 android:id="@+id/next"
                 android:src="@mipmap/next"
                 android:scaleType="fitXY"
-                android:layout_weight="1"
                 android:onClick="nextSong"
                 />
 
