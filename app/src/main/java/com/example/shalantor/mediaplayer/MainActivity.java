@@ -99,8 +99,12 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        onCreateSetup(savedInstanceState);
 
-        /*Get screen orientation*/
+    }
+
+    public void onCreateSetup(Bundle savedInstanceState){
+         /*Get screen orientation*/
         orientation = this.getResources().getConfiguration().orientation;
 
         /*Set audio stream and instantiate audiochangelistener*/
@@ -171,7 +175,10 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStart(){
         super.onStart();
+        onStartSetup();
+    }
 
+    public void onStartSetup(){
         if (Build.VERSION.SDK_INT < 23 || ( Build.VERSION.SDK_INT >=23 && checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE)
                 == PackageManager.PERMISSION_GRANTED)) {
             if (orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -194,7 +201,24 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         }
+    }
 
+    @Override
+    protected void onStop(){
+        if(player != null){
+            player.pause();
+        }
+        super.onStop();
+        finish();
+    }
+
+    @Override
+    protected void onPause(){
+        if(player != null){
+            player.pause();
+        }
+        super.onPause();
+        finish();
     }
 
     /*Method to add listener for audio focus*/
@@ -1291,13 +1315,10 @@ public class MainActivity extends AppCompatActivity
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if(grantResults[0]== PackageManager.PERMISSION_GRANTED){
             this.createPlaylist();
-            if (orientation == Configuration.ORIENTATION_PORTRAIT){
-                Intent i = getBaseContext().getPackageManager()
-                        .getLaunchIntentForPackage( getBaseContext().getPackageName() );
-                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                finish();
-                startActivity(i);
-            }
+            Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage( getBaseContext().getPackageName() );
+            i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            finish();
+            startActivity(i);
         }
     }
 
